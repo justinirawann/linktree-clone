@@ -1,0 +1,207 @@
+@import './front-type.css';
+
+.linkfy-ui.account-page {
+  --front-purple: #6750ad;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  color: #231c2b;
+  background: #fbfaf7;
+}
+.account-header,
+.account-main,
+.account-footer {
+  width: min(100% - clamp(40px, 9vw, 144px), 1280px);
+  margin-inline: auto;
+}
+.account-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 80px;
+  border-bottom: 1px solid #27203528;
+}
+.account-header > a:last-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.account-header > a:last-child:hover,
+.account-switch:hover,
+.account-form .text-btn:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.account-main {
+  display: grid;
+  flex: 1;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(36px, 7vw, 110px);
+  padding-block: clamp(24px, 3vw, 48px);
+}
+.account-form {
+  width: min(100%, 400px);
+  margin-inline: auto;
+}
+.account-form h1 {
+  font-size: clamp(2.8rem, 4.5vw, 4.6rem);
+  font-weight: 700;
+  letter-spacing: -0.068em;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+.account-description,
+.account-form > p {
+  color: #615968;
+  line-height: 1.55;
+}
+.account-description {
+  margin-top: 12px;
+}
+.account-form form,
+.account-form > .btn,
+.account-form > p:not(.account-description) {
+  margin-top: 24px;
+}
+.account-form fieldset {
+  display: grid;
+  min-width: 0;
+  gap: 17px;
+}
+.account-form .field input:not([type='range']):not([type='color']) {
+  min-height: 51px;
+  border-radius: 12px;
+}
+.account-page .account-form .primary {
+  width: 100%;
+  justify-content: space-between;
+  min-height: 52px;
+  padding-inline: 19px;
+  background: #292231;
+  color: #fff;
+  border-color: #292231;
+  border-radius: 14px;
+  font-size: 1rem;
+}
+.account-page .account-form .primary:hover:enabled,
+.account-page .account-form .primary[href]:hover {
+  background: #463655;
+}
+.account-form .primary svg {
+  color: var(--ly-lime);
+}
+.account-form .text-btn {
+  display: flex;
+  width: fit-content;
+  margin: 5px 0 0 auto;
+  padding-inline: 0;
+}
+.account-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  font-weight: 500;
+  color: #524a59;
+  font-size: 0.93rem;
+}
+.account-switch strong {
+  color: var(--front-purple);
+}
+.account-form > .account-switch {
+  border-top: 1px solid #27203528;
+  margin-top: 21px;
+  padding-top: 17px;
+  width: 100%;
+}
+.account-form .notice {
+  padding: 12px 15px;
+  border-radius: 12px;
+}
+.account-visual {
+  position: relative;
+  overflow: hidden;
+  min-height: clamp(480px, 70vh, 730px);
+  border-radius: 28px;
+  display: grid;
+  align-content: space-between;
+  background:
+    radial-gradient(ellipse at 70% 67%, #7d61acbf, transparent 68%),
+    radial-gradient(#f4e8ff35 0.7px, transparent 0.9px) 0 0 / 17px 17px,
+    #2b203b;
+  color: white;
+}
+.account-visual-copy {
+  font-size: clamp(2.8rem, 4.5vw, 5.2rem);
+  letter-spacing: -0.075em;
+  font-weight: 700;
+  line-height: 0.93;
+  padding: clamp(25px, 3.3vw, 54px) 0 0 clamp(25px, 3.3vw, 54px);
+}
+.account-visual-copy em {
+  --front-purple: #e9fa90;
+}
+.account-visual .sculpture {
+  width: 95%;
+  justify-self: center;
+  margin-block: -3% 3%;
+  --orbit: #d8c5fc58;
+  --spark: #e5d5ff;
+}
+.account-page[data-view='register'] .account-visual {
+  color: #31243d;
+  background:
+    radial-gradient(ellipse at 70% 66%, #efe8ffc9, transparent 68%),
+    radial-gradient(#67528055 0.7px, transparent 0.9px) 0 0 / 17px 17px,
+    #d9caf2;
+}
+.account-page[data-view='register'] .account-visual em {
+  --front-purple: #644394;
+}
+.account-page[data-view='register'] .sculpture {
+  --orbit: #6a478059;
+  --spark: #7656a1;
+}
+.account-footer {
+  border-top: 1px solid #27203528;
+  padding-block: 16px;
+  color: #6c6275;
+}
+@media (max-width: 760px) {
+  .account-header {
+    min-height: 66px;
+  }
+  .account-main {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: 26px;
+  }
+  .account-visual {
+    grid-row: 1;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    align-content: center;
+    min-height: 0;
+    height: clamp(116px, 22vw, 156px);
+    border-radius: 18px;
+  }
+  .account-visual-copy {
+    padding: 0 0 0 clamp(18px, 4vw, 32px);
+    font-size: clamp(1.9rem, 5vw, 2.85rem);
+  }
+  .account-visual .sculpture {
+    width: min(100%, 210px);
+    margin: 0;
+  }
+  .account-visual .sculpture-tag,
+  .account-visual .sculpture-star {
+    display: none;
+  }
+  .account-form {
+    margin-bottom: 8px;
+  }
+}

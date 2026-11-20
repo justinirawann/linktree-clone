@@ -1,23 +1,14 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Link2 } from 'lucide-react'
+import { EditorHeading } from '../../shared/ui/EditorHeading'
 import { Button, Field } from '../../shared/ui/Controls'
 import { ImageField } from '../../shared/ui/ImageField'
-import { linkSchema, ICON_KEYS } from '../../shared/lib/rules'
+import { linkSchema, ICON_LABELS } from '../../shared/lib/rules'
 import { linkRepository } from '../../features/links'
 import { saveWithImage } from '../../shared/lib/assetRepository'
 import { WhatsAppFields } from './WhatsAppFields'
 import { ChannelIcon } from '../../features/storefront'
-const ICON_LABELS = {
-  whatsapp: 'WA',
-  shopee: 'Shopee',
-  toco: 'Toco',
-  tokopedia: 'Tokopedia',
-  line: 'Line',
-  instagram: 'Kamera',
-  consign: 'Titip jual',
-  catalog: 'Katalog',
-  link: 'Tautan',
-}
 export function LinkForm({ editor, onCancel }) {
   const form = editor.draft
   const {
@@ -58,7 +49,7 @@ export function LinkForm({ editor, onCancel }) {
   return (
     <form className="editor-panel" onSubmit={handleSubmit(save)} noValidate>
       <fieldset disabled={editor.busy}>
-        <h2>{form.id ? 'Edit tautan' : 'Tautan baru'}</h2>
+        <EditorHeading icon={Link2}>{form.id ? 'Edit tautan' : 'Tautan baru'}</EditorHeading>
         <Field label="Judul tautan" error={errors.title?.message}>
           {(p) => <input {...p} {...connect('title')} maxLength={100} autoFocus />}
         </Field>
@@ -84,9 +75,9 @@ export function LinkForm({ editor, onCancel }) {
           <Field label="Ikon">
             {(p) => (
               <select {...p} {...connect('icon_key')}>
-                {ICON_KEYS.map((k) => (
-                  <option key={k} value={k}>
-                    {ICON_LABELS[k]}
+                {Object.entries(ICON_LABELS).map(([icon, label]) => (
+                  <option key={icon} value={icon}>
+                    {label}
                   </option>
                 ))}
               </select>

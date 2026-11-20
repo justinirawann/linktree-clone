@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { ArrowUp, ArrowDown, Copy, GripVertical, Pencil, Plus, Trash2 } from 'lucide-react'
+import { ArrowUp, ArrowDown, Copy, GripVertical, Link2, Pencil, Plus, Trash2 } from 'lucide-react'
+import { EditorHeading } from '../../shared/ui/EditorHeading'
 import { ChannelIcon } from '../../features/storefront'
 import { EMPTY_LINK } from '../../shared/lib/defaults'
 import { validUrl } from '../../shared/lib/rules'
@@ -66,7 +67,7 @@ export function LinksEditor({ page, editor }) {
     <section>
       <div className="list-heading">
         <div>
-          <h2>Daftar tautan</h2>
+          <EditorHeading icon={Link2}>Daftar tautan</EditorHeading>
           <p className="muted">
             {links.length} tautan · {links.filter((l) => l.is_active).length} aktif
           </p>

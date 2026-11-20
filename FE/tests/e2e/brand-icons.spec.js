@@ -9,8 +9,14 @@ test('logo dan warna tautan tersimpan serta tampil pada halaman publik', async (
     await picker.selectOption({ label })
     await expect(page.locator('.color-input [aria-hidden]')).toHaveCSS('mask-image', /\.svg/)
   }
+  await picker.selectOption({ label: 'Instagram' })
+  await expect(page.locator('.color-input [aria-hidden]')).toHaveCSS(
+    'mask-image',
+    /instagram_white\.svg/,
+  )
+  await picker.selectOption({ label: 'TikTok' })
   await page.getByLabel('Warna ikon').fill('#34cc88')
-  await page.getByLabel('URL tujuan').fill('https://line.me/')
+  await page.getByLabel('URL tujuan').fill('https://www.tiktok.com/@coreconsign')
   await page.getByLabel('Tautan aktif').check()
   await page.getByRole('button', { name: 'Simpan Perubahan' }).click()
   await expect(page.getByText('Perubahan tersimpan.')).toBeVisible()
@@ -19,7 +25,7 @@ test('logo dan warna tautan tersimpan serta tampil pada halaman publik', async (
   await page.getByRole('button', { name: 'Ya, publikasikan' }).click()
   await expect(page.getByRole('dialog')).toHaveCount(0)
   await page.goto(PUBLIC_PAGE_PATH)
-  const logo = page.locator('.channel-line [aria-hidden]')
+  const logo = page.locator('.channel-tiktok [aria-hidden]')
   await expect(logo).toHaveCSS('background-color', 'rgb(52, 204, 136)')
-  await expect(logo).toHaveCSS('mask-image', /line_white_original_vector\.svg/)
+  await expect(logo).toHaveCSS('mask-image', /tiktok_white\.svg/)
 })

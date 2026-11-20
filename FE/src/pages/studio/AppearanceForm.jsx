@@ -1,4 +1,5 @@
-import { Save, Check } from 'lucide-react'
+import { Save, Check, Palette } from 'lucide-react'
+import { EditorHeading } from '../../shared/ui/EditorHeading'
 import { THEMES } from '../../shared/lib/defaults'
 import { themeSchema } from '../../shared/lib/rules'
 import { appearanceRepository } from '../../features/appearance'
@@ -43,7 +44,7 @@ export function AppearanceForm({ page, editor }) {
   return (
     <form className="editor-panel" onSubmit={save}>
       <fieldset disabled={editor.busy}>
-        <h2>Preset tema</h2>
+        <EditorHeading icon={Palette}>Preset tema</EditorHeading>
         <div className="preset-grid">
           {Object.entries(NAMES).map(([key, name]) => (
             <button

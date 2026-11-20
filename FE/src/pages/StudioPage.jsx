@@ -14,6 +14,7 @@ import { LinksEditor } from './studio/LinksEditor'
 import { ProfileForm } from './studio/ProfileForm'
 import { AppearanceForm } from './studio/AppearanceForm'
 import { Settings } from './studio/Settings'
+import './studio/editor.css'
 const SECTIONS = {
   dashboard: ['Editor halaman', Link2],
   appearance: ['Tampilan', Palette],
@@ -88,7 +89,13 @@ function Studio({ section, local, userId }) {
               Pratinjau
             </Button>
           </div>
-          <div className={mobilePreview ? 'edit-content mobile-hidden' : 'edit-content'}>
+          <div
+            className={
+              mobilePreview
+                ? 'edit-content editor-surface mobile-hidden'
+                : 'edit-content editor-surface'
+            }
+          >
             {editor.feedback && (
               <div
                 className={'notice ' + (editor.feedback.error ? 'error-notice' : '')}

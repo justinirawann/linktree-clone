@@ -24,16 +24,19 @@ import {
   members,
   useMemberAvatar,
 } from '../features/members'
-import { Directory } from '../features/storefront'
+import { ChannelIcon, Directory } from '../features/storefront'
 import { EMPTY_LINK } from '../shared/lib/defaults'
 import { hasSupabase } from '../shared/lib/env'
 import { linkSchema } from '../shared/lib/rules'
 import { Button, Dialog, Field, StatusPage } from '../shared/ui/Controls'
 import { LinkfyLogo } from '../shared/ui/LinkfyLogo'
 import { ImageField } from '../shared/ui/ImageField'
+import { EditorHeading } from '../shared/ui/EditorHeading'
 import SharePanel from '../shared/ui/SharePanel'
 import { useEditor } from './studio/useEditor'
 import './members.css'
+import './studio/editor.css'
+import './studio/member-editor.css'
 
 const EDITOR_KEY = 'member-editor'
 function CreatePage({ userId }) {
@@ -46,8 +49,8 @@ function CreatePage({ userId }) {
   })
 
   return (
-    <section className="editor-panel">
-      <h2>Buat halamanmu</h2>
+    <section className="editor-panel editor-surface member-create">
+      <EditorHeading icon={UserRound}>Buat halamanmu</EditorHeading>
       <form
         onSubmit={(event) => {
           event.preventDefault()
@@ -167,21 +170,31 @@ function EditPage({ page, userId }) {
 
   return (
     <div className="member-layout">
-      <div className="member-editor">
+      <div className="member-editor editor-surface">
         <nav className="member-shortcuts" aria-label="Bagian editor">
-          <Link to="#profil">
+          <Link
+            to="#profil"
+            aria-current={['', '#profil'].includes(location.hash) ? 'location' : undefined}
+          >
             <UserRound size={16} />
             Profil
           </Link>
-          <Link to="#tampilan">
+          <Link
+            to="#tampilan"
+            aria-current={location.hash === '#tampilan' ? 'location' : undefined}
+          >
             <Palette size={16} />
             Tampilan
           </Link>
-          <Link to="#tautan">
+          <Link to="#tautan" aria-current={location.hash === '#tautan' ? 'location' : undefined}>
             <Link2 size={16} />
             Tautan
           </Link>
-          <Link to="#pratinjau" className="preview-shortcut">
+          <Link
+            to="#pratinjau"
+            className="preview-shortcut"
+            aria-current={location.hash === '#pratinjau' ? 'location' : undefined}
+          >
             <Smartphone size={16} />
             Pratinjau
           </Link>
@@ -189,50 +202,54 @@ function EditPage({ page, userId }) {
         <form className="member-form" onSubmit={submit}>
           <fieldset disabled={editor.busy}>
             <section className="editor-panel member-section" id="profil" tabIndex={-1}>
-              <h2>
-                <UserRound aria-hidden="true" />
-                Profil dan halaman
-              </h2>
-              <ImageField
-                label="Foto profil"
-                folder="avatars"
-                path={draft.avatar_path}
-                image={draft.avatarImage}
-                imageSrc={draftAvatar || ''}
-                onChange={(avatarImage, avatar_path) => update({ avatarImage, avatar_path })}
-                onProcessing={editor.setProcessing}
-              />
-              {draft.avatar_path && avatar.isError && (
-                <p className="muted" role="status">
-                  Foto tersimpan belum bisa dimuat.
-                </p>
-              )}
-              <Field label="Nama profil">
-                {(props) => (
-                  <input
-                    {...props}
-                    required
-                    maxLength={60}
-                    value={draft.display_name}
-                    onChange={(event) => update({ display_name: event.target.value })}
+              <EditorHeading icon={UserRound}>Profil dan halaman</EditorHeading>
+              <div className="editor-profile-grid">
+                <div className="editor-profile-photo">
+                  <ImageField
+                    label="Foto profil"
+                    folder="avatars"
+                    path={draft.avatar_path}
+                    image={draft.avatarImage}
+                    imageSrc={draftAvatar || ''}
+                    onChange={(avatarImage, avatar_path) => update({ avatarImage, avatar_path })}
+                    onProcessing={editor.setProcessing}
                   />
-                )}
-              </Field>
-              <Field label="Bio" hint={draft.bio.length + '/160 karakter'}>
-                {(props) => (
-                  <textarea
-                    {...props}
-                    rows={3}
-                    placeholder="Ceritakan sedikit tentangmu atau tokomu"
-                    maxLength={160}
-                    value={draft.bio}
-                    onChange={(event) => update({ bio: event.target.value })}
-                  />
-                )}
-              </Field>
+                  {draft.avatar_path && avatar.isError && (
+                    <p className="muted" role="status">
+                      Foto tersimpan belum bisa dimuat.
+                    </p>
+                  )}
+                </div>
+                <div className="editor-profile-text">
+                  <Field label="Nama profil">
+                    {(props) => (
+                      <input
+                        {...props}
+                        required
+                        maxLength={60}
+                        value={draft.display_name}
+                        onChange={(event) => update({ display_name: event.target.value })}
+                      />
+                    )}
+                  </Field>
+                  <Field label="Bio" hint={draft.bio.length + '/160 karakter'}>
+                    {(props) => (
+                      <textarea
+                        {...props}
+                        rows={3}
+                        placeholder="Ceritakan sedikit tentangmu atau tokomu"
+                        maxLength={160}
+                        value={draft.bio}
+                        onChange={(event) => update({ bio: event.target.value })}
+                      />
+                    )}
+                  </Field>
+                </div>
+              </div>
             </section>
             <MemberAppearance preset={draft.theme} settings={draft.appearance} onChange={update} />
             <MemberLinks
+              linkIcon={ChannelIcon}
               links={draft.links}
               issue={issue}
               preset={draft.theme}
@@ -278,10 +295,7 @@ function EditPage({ page, userId }) {
         {editor.feedback?.conflict && <Button onClick={editor.reload}>Muat versi terbaru</Button>}
         {page.published && (
           <section className="editor-panel">
-            <h2>
-              <ScanLine size={20} />
-              Bagikan halaman
-            </h2>
+            <EditorHeading icon={ScanLine}>Bagikan halaman</EditorHeading>
             <Link className="member-public-link" to={memberPagePath(page.slug)}>
               Lihat halaman publik <ArrowUpRight size={15} />
             </Link>
@@ -372,7 +386,9 @@ export default function MemberStudioPage() {
       <div className="member-shell">
         <div className="member-hero">
           <div>
-            <h1>Studio Linkfy</h1>
+            <h1>
+              Studio <em>Linkfy</em>
+            </h1>
             {page.data && (
               <div className="member-page-meta">
                 <span className="member-address">
@@ -387,11 +403,7 @@ export default function MemberStudioPage() {
             )}
           </div>
           <div className="member-hero-art" aria-hidden="true">
-            <span />
-            <span />
-            <span>
-              <img src="/linkfy-ly-black.svg" alt="" width="80" height="80" />
-            </span>
+            <img src="/linkfy-chain.webp" alt="" width="960" height="960" />
           </div>
         </div>
         {logout.isError && <p role="alert">Gagal keluar. Coba lagi.</p>}

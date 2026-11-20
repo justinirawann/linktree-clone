@@ -70,10 +70,18 @@ describe('migrasi dan hak akses PostgreSQL', () => {
     await expect(save({ url: 'javascript:test', is_active: true })).rejects.toMatchObject({
       code: '23514',
     })
-    await save({ url: 'https://wa.me/62812345678', is_active: true })
+    await expect(save({ icon_key: 'unknown' })).rejects.toMatchObject({ code: '23514' })
+    await save({
+      url: 'https://www.tiktok.com/@coreconsign',
+      icon_key: 'tiktok',
+      icon_color: '#34cc88',
+      is_active: true,
+    })
     await expect(save({ title: 'Stale' })).rejects.toMatchObject({ code: 'PT409' })
     await db.exec('select public.set_publication(1,true)')
-    expect((await scalar('select public.get_public_page()')).links).toHaveLength(1)
+    expect((await scalar('select public.get_public_page()')).links).toMatchObject([
+      { icon_key: 'tiktok', icon_color: '#34cc88' },
+    ])
     for (const [name, uid] of [
       ['anon', ''],
       ['authenticated', other],
@@ -190,6 +198,9 @@ describe('migrasi dan hak akses PostgreSQL', () => {
     await expect(
       save(created.revision, [{ ...active, url: 'javascript:alert(1)' }], true),
     ).rejects.toMatchObject({ code: '23514' })
+    await expect(
+      save(created.revision, [{ ...active, icon_key: 'unknown' }], true),
+    ).rejects.toMatchObject({ code: '23514' })
     const published = await save(created.revision, [active, inactive], true)
     await expect(save(created.revision, [active], false)).rejects.toMatchObject({ code: 'PT409' })
 
@@ -279,10 +290,10 @@ describe('migrasi dan hak akses PostgreSQL', () => {
     const links = [true, false].map((is_active, index) => ({
       id: '10000000-0000-4000-8000-00000000000' + index,
       title: 'Tautan ' + index,
-      url: 'https://instagram.com/tema',
+      url: 'https://www.tiktok.com/@tema',
       is_active,
-      icon_key: 'link',
-      icon_color: '#ffffff',
+      icon_key: 'tiktok',
+      icon_color: '#34cc88',
     }))
     const iconStyle = { shape: 'square', icon_style: 'outline', icon_shape: 'circle' }
     const styles = { [links[0].id]: iconStyle, [links[1].id]: { effect: 'glass' } }
@@ -314,6 +325,7 @@ describe('migrasi dan hak akses PostgreSQL', () => {
     await role('anon')
     const published = await scalar("select public.get_member_page('tema')")
     expect(published.appearance).toEqual(appearance)
+    expect(published.links).toMatchObject([{ icon_key: 'tiktok', icon_color: '#34cc88' }])
     expect(published.link_styles).toEqual({ [links[0].id]: iconStyle })
     await expect(save({}, {}, saved.revision)).rejects.toMatchObject({ code: '42501' })
   })

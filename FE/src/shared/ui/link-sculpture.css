@@ -1,0 +1,110 @@
+.sculpture {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.18;
+  perspective: 850px;
+  isolation: isolate;
+  container-type: inline-size;
+  --orbit: #705cbd48;
+  --spark: #6852cb;
+}
+.sculpture::before {
+  content: '';
+  position: absolute;
+  inset: 10% 2%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, #ae96fb45, transparent 68%);
+}
+.sculpture-orbit,
+.sculpture-orbit::after {
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid var(--orbit);
+  border-radius: 50%;
+}
+.sculpture-orbit {
+  inset: 27% -1% 23%;
+  transform: rotate(-24deg);
+}
+.sculpture-orbit::after {
+  content: '';
+  inset: -2% 4%;
+  border-style: dashed;
+  transform: rotate(46deg);
+}
+.sculpture-assembly {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.sculpture-chain {
+  position: absolute;
+  height: 95%;
+  width: auto;
+  max-width: 88%;
+  object-fit: contain;
+  left: 50%;
+  top: 49%;
+  transform: translate(-50%, -50%) translateZ(16px);
+  filter: drop-shadow(0 19px 12px #39206c2a);
+  user-select: none;
+}
+.sculpture-tag {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.58em;
+  border: 1px solid #27183822;
+  padding: 0.4em 0.74em 0.4em 0.4em;
+  border-radius: 99px;
+  background: #fffdfd;
+  color: #251d33;
+  font-size: clamp(0.7rem, 2.5cqw, 1rem);
+  font-weight: 700;
+  box-shadow:
+    0 3px 0 #4b365f18,
+    0 9px 20px #3a24471a;
+}
+.sculpture-tag i {
+  display: grid;
+  place-items: center;
+  width: 2.15em;
+  height: 2.15em;
+  border-radius: 50%;
+}
+.sculpture-shop {
+  top: 21%;
+  left: 5%;
+  transform: translateZ(38px) rotate(-9deg);
+}
+.sculpture-shop i {
+  background: #e2d5ff;
+}
+.sculpture-portfolio {
+  right: 2%;
+  bottom: 18%;
+  transform: translateZ(48px) rotate(8deg);
+}
+.sculpture-portfolio i {
+  background: #e7f5aa;
+}
+.sculpture-star {
+  position: absolute;
+  top: 7%;
+  left: 26%;
+  width: 6%;
+  height: auto;
+  color: var(--spark);
+  fill: currentColor;
+  transform: translateZ(28px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sculpture-chain {
+    animation: sculpture-arrive 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes sculpture-arrive {
+    from {
+      transform: translate(-50%, -45%) translateZ(8px) rotate(-8deg) scale(0.94);
+    }
+  }
+}

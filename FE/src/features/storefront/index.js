@@ -1,1 +1,2 @@
-export { default as Directory, ChannelIcon } from './Directory'
+export { default as Directory } from './Directory'
+export { ChannelIcon } from '../../shared/ui/ChannelIcon'

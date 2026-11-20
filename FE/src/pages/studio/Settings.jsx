@@ -5,6 +5,7 @@ import { useMutation } from '@tanstack/react-query'
 import { auth } from '../../features/auth'
 import { siteRepository } from '../../features/site'
 import { Button, Dialog } from '../../shared/ui/Controls'
+import { EditorHeading } from '../../shared/ui/EditorHeading'
 import SharePanel from '../../shared/ui/SharePanel'
 export function Settings({ page, editor, local }) {
   const [confirm, setConfirm] = useState(false),
@@ -19,10 +20,7 @@ export function Settings({ page, editor, local }) {
   return (
     <div className="settings-stack">
       <section className="editor-panel">
-        <h2>
-          <Globe size={19} />
-          Publikasi halaman
-        </h2>
+        <EditorHeading icon={Globe}>Publikasi halaman</EditorHeading>
         <p className="muted">
           {published
             ? 'Pengunjung dapat melihat profil dan semua tautan aktif.'
@@ -33,10 +31,7 @@ export function Settings({ page, editor, local }) {
         </Button>
       </section>
       <section className="editor-panel">
-        <h2>
-          <Share2 size={19} />
-          Bagikan toko
-        </h2>
+        <EditorHeading icon={Share2}>Bagikan toko</EditorHeading>
         <SharePanel name={page.profile.store_name} />
       </section>
       <Button disabled={editor.busy || logout.isPending} onClick={() => logout.mutate()}>

@@ -1,0 +1,11 @@
+@import '@fontsource/instrument-serif/latin-400-italic.css';
+
+.ly-page :is(h1, h2) em,
+.account-page h1 em,
+.account-visual em {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  color: var(--front-purple);
+}

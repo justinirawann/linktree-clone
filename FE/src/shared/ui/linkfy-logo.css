@@ -1,0 +1,32 @@
+.linkfy-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  min-height: 44px;
+  color: inherit;
+  font-weight: 700;
+  font-size: 1.6rem;
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.linkfy-mark {
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #e8fa81;
+  overflow: hidden;
+}
+
+.linkfy-mark-dark {
+  background: #51416f;
+}
+
+.linkfy-mark img {
+  width: 40px;
+  height: 40px;
+  transform: scale(1.16) translate(-0.2px, -1px);
+}

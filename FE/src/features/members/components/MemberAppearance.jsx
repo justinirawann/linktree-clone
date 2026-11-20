@@ -1,5 +1,6 @@
 import { Field } from '../../../shared/ui/Controls'
 import { ColorField } from '../../../shared/ui/ColorField'
+import { EditorHeading } from '../../../shared/ui/EditorHeading'
 import { Palette } from 'lucide-react'
 import {
   BUTTON_EFFECTS,
@@ -79,78 +80,82 @@ export function MemberAppearance({ preset, settings = {}, onChange }) {
       tabIndex={-1}
       aria-label="Tampilan halaman"
     >
-      <h2>
-        <Palette aria-hidden="true" />
-        Tampilan halaman
-      </h2>
-      <div className="member-link-fields">
-        <Field label="Tema">
-          {(props) => (
-            <select
-              {...props}
-              value={preset}
-              onChange={(e) => {
-                const colors = { ...settings }
-                delete colors.background
-                delete colors.gradient
-                const fields = { theme: e.target.value }
-                if (settings.background || settings.gradient) fields.appearance = colors
-                onChange(fields)
-              }}
-            >
-              <option value="light">Terang</option>
-              <option value="dark">Gelap</option>
-              <option value="gradient">Gradasi</option>
-            </select>
-          )}
-        </Field>
-        <ColorField
-          label="Warna latar"
-          value={theme.background_color}
-          custom={settings.background}
-          resetLabel="Pakai preset"
-          onChange={(v) => onChange({ appearance: patchStyle(settings, 'background', v) })}
-        />
-        {preset === 'gradient' && (
-          <ColorField
-            label="Warna akhir gradasi"
-            value={theme.gradient_color}
-            custom={settings.gradient}
-            resetLabel="Pakai preset"
-            onChange={(v) => onChange({ appearance: patchStyle(settings, 'gradient', v) })}
-          />
-        )}
-      </div>
-      <h3>Tombol tautan</h3>
-      <p className="muted">
-        Warna tombol dan teks menyesuaikan latar sampai kamu memilih warna sendiri.
-      </p>
-      <ButtonFields
-        settings={settings}
-        button={button}
-        onChange={(appearance) => onChange({ appearance })}
-      />
-      <h3>Ikon semua tautan</h3>
-      <div className="member-link-fields">
-        {iconFields.map(([key, label, selected, options]) => (
-          <Field key={key} label={label}>
+      <EditorHeading icon={Palette}>Tampilan halaman</EditorHeading>
+      <div className="editor-group">
+        <h3>Latar halaman</h3>
+        <div className="member-link-fields">
+          <Field label="Tema">
             {(props) => (
               <select
                 {...props}
-                value={selected}
-                onChange={(e) =>
-                  onChange({ appearance: patchStyle(settings, key, e.target.value) })
-                }
+                value={preset}
+                onChange={(e) => {
+                  const colors = { ...settings }
+                  delete colors.background
+                  delete colors.gradient
+                  const fields = { theme: e.target.value }
+                  if (settings.background || settings.gradient) fields.appearance = colors
+                  onChange(fields)
+                }}
               >
-                {Object.entries(options).map(([value, name]) => (
-                  <option key={value} value={value}>
-                    {name}
-                  </option>
-                ))}
+                <option value="light">Terang</option>
+                <option value="dark">Gelap</option>
+                <option value="gradient">Gradasi</option>
               </select>
             )}
           </Field>
-        ))}
+          <ColorField
+            label="Warna latar"
+            value={theme.background_color}
+            custom={settings.background}
+            resetLabel="Pakai preset"
+            onChange={(v) => onChange({ appearance: patchStyle(settings, 'background', v) })}
+          />
+          {preset === 'gradient' && (
+            <ColorField
+              label="Warna akhir gradasi"
+              value={theme.gradient_color}
+              custom={settings.gradient}
+              resetLabel="Pakai preset"
+              onChange={(v) => onChange({ appearance: patchStyle(settings, 'gradient', v) })}
+            />
+          )}
+        </div>
+      </div>
+      <div className="editor-group">
+        <h3>Tombol tautan</h3>
+        <p className="muted">
+          Warna tombol dan teks menyesuaikan latar sampai kamu memilih warna sendiri.
+        </p>
+        <ButtonFields
+          settings={settings}
+          button={button}
+          onChange={(appearance) => onChange({ appearance })}
+        />
+      </div>
+      <div className="editor-group">
+        <h3>Ikon semua tautan</h3>
+        <div className="member-link-fields">
+          {iconFields.map(([key, label, selected, options]) => (
+            <Field key={key} label={label}>
+              {(props) => (
+                <select
+                  {...props}
+                  value={selected}
+                  onChange={(e) =>
+                    onChange({ appearance: patchStyle(settings, key, e.target.value) })
+                  }
+                >
+                  {Object.entries(options).map(([value, name]) => (
+                    <option key={value} value={value}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </Field>
+          ))}
+        </div>
       </div>
     </section>
   )

@@ -1,0 +1,277 @@
+.ly-demo {
+  perspective: 950px;
+  isolation: isolate;
+  position: relative;
+  min-height: 530px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  padding: 44px 14px 73px;
+  border-radius: 32px;
+  overflow: hidden;
+  color: #f7efff;
+  background:
+    radial-gradient(ellipse at 70% 24%, #60468d 0%, transparent 57%),
+    radial-gradient(circle, #ae92dc55 1px, transparent 1.2px) 0 0 / 20px 20px,
+    var(--ly-stage);
+}
+
+.ly-orbit,
+.ly-orbit::before,
+.ly-orbit::after {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  border: 1px solid #bfa6ef59;
+  border-radius: 50%;
+}
+
+.ly-orbit {
+  width: 113%;
+  height: 52%;
+  inset: 25% -6%;
+  transform: rotate(-34deg);
+}
+
+.ly-orbit::before,
+.ly-orbit::after {
+  content: '';
+  inset: -26px -18px;
+}
+
+.ly-orbit::after {
+  inset: -51px -36px;
+}
+
+.ly-demo::before {
+  content: '';
+  position: absolute;
+  bottom: 11%;
+  width: 54%;
+  height: 34px;
+  border-radius: 50%;
+  background: #140c23a8;
+  filter: blur(15px);
+  transform: rotate(-5deg);
+  pointer-events: none;
+}
+
+.ly-stage-label {
+  position: absolute;
+  top: 20px;
+  left: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #efe5ff;
+  font:
+    600 0.75rem/1.4 ui-monospace,
+    Consolas,
+    monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.ly-stage-label span {
+  width: 7px;
+  height: 7px;
+  border: 1px solid #d3b5ff;
+  border-radius: 50%;
+}
+
+.ly-phone {
+  transform: rotateY(-14deg) rotateX(6deg) rotateZ(-4deg);
+  --demo-paper: #e3d8fb;
+  --demo-ink: #2e1d46;
+  --demo-panel: #f8f3ff;
+  --demo-border: #c2a9e6;
+  --demo-avatar: #2e1d46;
+  --demo-avatar-ink: #eddfff;
+  width: min(100%, 246px);
+  padding: 13px 15px 14px;
+  border: 6px solid #1b1527;
+  border-radius: 30px;
+  color: var(--demo-ink);
+  background: var(--demo-paper);
+  box-shadow:
+    0 0 0 1px #b29ac787,
+    2px 1px 0 #d5cce1,
+    4px 2px 0 #847b91,
+    7px 4px 0 #423a4e,
+    9px 5px 0 #201b29,
+    18px 23px 35px #170c2499;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.ly-phone[data-theme='lime'] {
+  --demo-paper: #e8f998;
+  --demo-ink: #25311a;
+  --demo-panel: #f9ffdf;
+  --demo-border: #b3c56c;
+  --demo-avatar: #364523;
+  --demo-avatar-ink: #edfbbd;
+}
+
+.ly-phone[data-theme='dark'] {
+  --demo-paper: #262238;
+  --demo-ink: #f4eefa;
+  --demo-panel: #372f4b;
+  --demo-border: #675882;
+  --demo-avatar: #d1bcf9;
+  --demo-avatar-ink: #312147;
+}
+
+.ly-phone-top,
+.ly-phone-profile,
+.ly-phone-footer {
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.ly-phone-top {
+  padding-bottom: 13px;
+  border-bottom: 1px solid var(--demo-border);
+}
+
+.ly-phone-address {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font:
+    600 0.74rem/1.4 ui-monospace,
+    Consolas,
+    monospace;
+}
+
+.ly-phone-profile {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin: 18px 0;
+}
+
+.ly-demo-avatar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 19px;
+  background: var(--demo-avatar);
+  color: var(--demo-avatar-ink);
+  transform: rotate(-9deg);
+}
+
+.ly-demo-avatar i {
+  position: absolute;
+  width: 31px;
+  height: 18px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  transform: rotate(45deg);
+}
+
+.ly-demo-avatar i:last-child {
+  transform: rotate(-45deg);
+}
+
+.ly-phone-profile h2 {
+  margin-top: 4px;
+  font-size: 1.38rem;
+  font-weight: 700;
+  letter-spacing: -0.057em;
+}
+
+.ly-phone-profile p {
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+.ly-phone-links {
+  display: grid;
+  gap: 7px;
+}
+
+.ly-phone-links li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid var(--demo-border);
+  border-radius: 11px;
+  background: var(--demo-panel);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.ly-phone-footer {
+  margin-top: 14px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.ly-theme-picker {
+  position: absolute;
+  left: 25px;
+  bottom: 14px;
+  display: flex;
+  gap: 1px;
+  margin: 0;
+}
+
+.ly-theme-picker legend {
+  float: left;
+  margin-right: 6px;
+  padding: 0 5px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 43px;
+}
+
+.ly-theme-option {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  cursor: pointer;
+}
+
+.ly-theme-option input,
+.ly-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.ly-theme-option i {
+  width: 27px;
+  height: 27px;
+  border: 1px solid #ebe1fd90;
+  border-radius: 50%;
+  background: var(--swatch);
+}
+
+.ly-theme-option input:checked ~ i {
+  outline: 2px solid #f6ebff;
+  outline-offset: 3px;
+}
+
+.ly-theme-option input:focus-visible ~ i {
+  box-shadow: 0 0 0 7px #a98ddb;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ly-phone {
+    transition: none;
+  }
+}

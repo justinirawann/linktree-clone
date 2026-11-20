@@ -1,15 +1,17 @@
 import { z } from 'zod'
-export const ICON_KEYS = [
-  'whatsapp',
-  'shopee',
-  'toco',
-  'tokopedia',
-  'line',
-  'instagram',
-  'consign',
-  'catalog',
-  'link',
-]
+export const ICON_LABELS = {
+  whatsapp: 'WA',
+  shopee: 'Shopee',
+  toco: 'Toco',
+  tokopedia: 'Tokopedia',
+  line: 'Line',
+  instagram: 'Instagram',
+  tiktok: 'TikTok',
+  consign: 'Titip jual',
+  catalog: 'Katalog',
+  link: 'Tautan',
+}
+export const ICON_KEYS = Object.keys(ICON_LABELS)
 export const PLATFORMS = {
   instagram: 'Instagram',
   whatsapp: 'WhatsApp',

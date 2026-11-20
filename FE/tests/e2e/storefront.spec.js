@@ -100,7 +100,11 @@ for (const width of [360, 390, 768, 1440]) {
       page.getByRole('heading', { level: 1, name: /Satu link.*Semua tujuan/ }),
     ).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
-    await page.getByRole('link', { name: 'Core Consign' }).click()
+    await expect(page.getByRole('contentinfo').getByText(/core consign/i)).toHaveCount(0)
+    await expect(
+      page.getByRole('navigation', { name: 'Akun Linkfy' }).getByRole('link', { name: 'Daftar' }),
+    ).toHaveAttribute('href', '/register')
+    await page.goto(PUBLIC_PAGE_PATH)
     await expect(page).toHaveURL(PUBLIC_PAGE_PATH)
     await expect(page.getByRole('heading', { name: 'Core Consign', exact: true })).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
@@ -126,4 +130,19 @@ test('landing Linkfy punya demo tema dan jalur ke Studio', async ({ page }) => {
   await expect(page.locator('.ly-phone')).toHaveCSS('background-color', 'rgb(232, 249, 152)')
   await page.getByRole('link', { name: 'Buka Studio', exact: true }).first().click()
   await expect(page.getByRole('heading', { name: 'Daftar tautan' })).toBeVisible()
+})
+
+test('ilustrasi mengikuti pointer dan menghormati preferensi gerak', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' })
+  await page.goto('/')
+  const sculpture = page.locator('.sculpture')
+  const assembly = sculpture.locator('.sculpture-assembly')
+  await sculpture.hover({ position: { x: 10, y: 10 } })
+  await expect(assembly).not.toHaveCSS('transform', 'none')
+
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.reload()
+  await sculpture.hover({ position: { x: 10, y: 10 } })
+  await expect(assembly).toHaveCSS('transform', 'none')
+  await expect(sculpture.locator('img')).toHaveCSS('animation-name', 'none')
 })

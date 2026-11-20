@@ -1,12 +1,12 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { createBrowserRouter, RouterProvider, Outlet, useLocation, Link } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import LandingPage from './pages/LandingPage'
 import { canonicalUrl, localStudio } from './shared/lib/env'
 import { PUBLIC_PAGE_PATH } from './shared/lib/routes'
 import { StatusPage } from './shared/ui/Controls'
 import { LinkfyLogo } from './shared/ui/LinkfyLogo'
-const AuthPage = lazy(() => import('./pages/AuthPage')),
+const LandingPage = lazy(() => import('./pages/LandingPage')),
+  AuthPage = lazy(() => import('./pages/AuthPage')),
   StudioPage = lazy(() => import('./pages/StudioPage')),
   PublicPage = lazy(() => import('./pages/PublicPage')),
   RegisterPage = lazy(() => import('./pages/RegisterPage')),
@@ -25,6 +25,9 @@ function Layout() {
     if (canonical && canonicalUrl && (isHome || isStore || isMemberPage))
       canonical.setAttribute('href', new URL(path, canonicalUrl).href)
     if (isHome) document.title = 'Linkfy — Satu link. Semua tujuan.'
+    else if (path === '/admin/login') document.title = 'Masuk • Linkfy'
+    else if (path === '/register') document.title = 'Daftar • Linkfy'
+    else if (path === '/admin/reset-password') document.title = 'Ubah kata sandi • Linkfy'
     else if (isStore) document.title = 'Core Consign — Komputer & Titip Jual'
     else if (isMemberPage) document.title = 'Halaman Linkfy'
     else document.title = 'Studio • Linkfy'

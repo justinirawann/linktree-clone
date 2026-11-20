@@ -1,22 +1,19 @@
 import { EMPTY_LINK } from '../../../shared/lib/defaults'
-import { ICON_KEYS } from '../../../shared/lib/rules'
+import { ICON_LABELS } from '../../../shared/lib/rules'
 import { Button, Field } from '../../../shared/ui/Controls'
 import { ColorField } from '../../../shared/ui/ColorField'
-import { ArrowDown, ArrowUp, Link2, Plus, Trash2 } from 'lucide-react'
+import { EditorHeading } from '../../../shared/ui/EditorHeading'
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronDown,
+  Link2,
+  Plus,
+  SlidersHorizontal,
+  Trash2,
+} from 'lucide-react'
 import { resolveMemberTheme, resolveLinkButton } from '../themes'
 import { ButtonFields } from './MemberAppearance'
-
-const ICON_NAMES = [
-  'WA',
-  'Shopee',
-  'Toco',
-  'Tokopedia',
-  'Line',
-  'Instagram',
-  'Titip jual',
-  'Katalog',
-  'Tautan',
-]
 
 export function MemberLinks({
   links,
@@ -26,6 +23,7 @@ export function MemberLinks({
   appearance,
   linkStyles = {},
   onStyleChange,
+  linkIcon: LinkIcon = Link2,
 }) {
   const theme = resolveMemberTheme(preset, appearance)
   function update(index, patch) {
@@ -41,10 +39,7 @@ export function MemberLinks({
   return (
     <section id="tautan" className="editor-panel member-section member-links" tabIndex={-1}>
       <div className="member-links-heading">
-        <h2>
-          <Link2 aria-hidden="true" />
-          Tautan
-        </h2>
+        <EditorHeading icon={Link2}>Tautan</EditorHeading>
         <Button
           disabled={links.length >= 50}
           onClick={() =>
@@ -55,8 +50,17 @@ export function MemberLinks({
           Tambah tautan
         </Button>
       </div>
+      {!links.length && (
+        <p className="editor-empty">Tambahkan tautan pertama yang ingin kamu bagikan.</p>
+      )}
       {links.map((link, index) => (
-        <div className="member-link-card" key={link.id}>
+        <article className="member-link-card" key={link.id}>
+          <header className="member-link-title">
+            <span aria-hidden="true">
+              <LinkIcon name={link.icon_key} color={link.icon_color} size={21} />
+            </span>
+            <h3>{link.title.trim() || 'Tautan ' + (index + 1)}</h3>
+          </header>
           <div className="member-link-fields">
             <Field
               label={'Judul tautan ' + (index + 1)}
@@ -95,9 +99,9 @@ export function MemberLinks({
                   value={link.icon_key}
                   onChange={(event) => update(index, { icon_key: event.target.value })}
                 >
-                  {ICON_KEYS.map((icon, position) => (
+                  {Object.entries(ICON_LABELS).map(([icon, label]) => (
                     <option key={icon} value={icon}>
-                      {ICON_NAMES[position]}
+                      {label}
                     </option>
                   ))}
                 </select>
@@ -110,7 +114,11 @@ export function MemberLinks({
             />
           </div>
           <details className="member-link-style">
-            <summary>Tampilan khusus tautan {index + 1}</summary>
+            <summary>
+              <SlidersHorizontal size={16} aria-hidden="true" />
+              Tampilan khusus tautan {index + 1}
+              <ChevronDown size={16} aria-hidden="true" />
+            </summary>
             <ButtonFields
               settings={linkStyles[link.id] || {}}
               button={resolveLinkButton(theme, linkStyles[link.id])}
@@ -144,7 +152,7 @@ export function MemberLinks({
               Hapus
             </Button>
           </div>
-        </div>
+        </article>
       ))}
     </section>
   )

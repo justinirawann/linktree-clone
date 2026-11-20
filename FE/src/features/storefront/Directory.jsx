@@ -1,62 +1,15 @@
 import { lazy, Suspense, useState } from 'react'
-import {
-  Cpu,
-  Share2,
-  Camera,
-  PackageOpen,
-  BookOpen,
-  Link2,
-  ExternalLink,
-  Globe,
-  Music2,
-  Video,
-  Layers3,
-  ScanLine,
-  User,
-} from 'lucide-react'
+import { Cpu, Share2, ExternalLink, Layers3, ScanLine, User } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Brand, Button, Dialog } from '../../shared/ui/Controls'
 import { AssetImage, useAsset } from '../../shared/ui/AssetImage'
+import { ChannelIcon } from '../../shared/ui/ChannelIcon'
 import { themeSchema, PLATFORMS, validUrl } from '../../shared/lib/rules'
 import { THEMES } from '../../shared/lib/defaults'
 import { localStudio } from '../../shared/lib/env'
 const SharePanel = lazy(() => import('../../shared/ui/SharePanel'))
 const LinkPreview = lazy(() => import('./LinkPreview'))
 import './link-preview.css'
-const icons = {
-  instagram: Camera,
-  consign: PackageOpen,
-  catalog: BookOpen,
-  link: Link2,
-  website: Globe,
-  youtube: Video,
-  tiktok: Music2,
-}
-const brandMasks = {
-  whatsapp: 'url(/whatsapp_white_vector.svg) center / 114% no-repeat',
-  shopee: 'url(/shopee_white_vector.svg) center / 114% no-repeat',
-  toco: 'url(/toco_white_vector.svg) center / 114% no-repeat',
-  tokopedia: 'url(/tokopedia_logo_vectorized_white_1x1.svg) center / 125% no-repeat',
-  line: 'url(/line_white_original_vector.svg) center / 216% no-repeat',
-}
-export function ChannelIcon({ name, size = 22, color }) {
-  if (brandMasks[name])
-    return (
-      <span
-        aria-hidden="true"
-        style={{
-          display: 'inline-block',
-          width: size,
-          height: size,
-          backgroundColor: color || '#ffffff',
-          mask: brandMasks[name],
-          WebkitMask: brandMasks[name],
-        }}
-      />
-    )
-  const Icon = icons[name] || Link2
-  return <Icon size={size} color={color} strokeWidth={1.75} aria-hidden="true" />
-}
 const FONTS = {
   dm: '"DM Sans", sans-serif',
   system: 'system-ui, sans-serif',
