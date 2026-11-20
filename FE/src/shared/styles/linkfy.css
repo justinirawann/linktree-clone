@@ -1,0 +1,422 @@
+:root {
+  --ly-ink: #211b2c;
+  --ly-muted: #5a5267;
+  --ly-paper: #f8f7fc;
+  --ly-stage: #30244c;
+  --ly-lime: #e8fa81;
+  --ly-rule: #dcd7e5;
+  --ly-accent: #60459e;
+  --ly-lavender: #ede4ff;
+  --ly-white: #fff;
+  --ly-danger: #9d283b;
+}
+
+.linkfy-ui {
+  min-height: 100dvh;
+  color-scheme: light;
+  color: var(--ly-ink);
+  background: var(--ly-paper);
+}
+
+.linkfy-ui.auth-page {
+  background:
+    radial-gradient(ellipse at 4% 5%, #dfcef6 0%, transparent 43%),
+    radial-gradient(ellipse at 98% 94%, #e8f3b2 0%, transparent 38%),
+    radial-gradient(#c9bedb 1px, transparent 1.4px) 0 0 / 22px 22px,
+    var(--ly-paper);
+}
+
+.linkfy-ui :is(.auth-card, .status-card, .editor-panel, .editor-links li, .studio-head, .dialog),
+.member-directory .dialog {
+  color: var(--ly-ink);
+  background: var(--ly-white);
+  border-color: var(--ly-rule);
+}
+
+.linkfy-ui .auth-card h1,
+.linkfy-ui .status-card h1,
+.linkfy-ui .studio-title h1 {
+  font: 700 clamp(2rem, 4vw, 2.6rem) / 1.08 var(--font-sans);
+  letter-spacing: -0.05em;
+}
+
+.linkfy-ui
+  :is(.back-store, .eyebrow, .text-btn, .wa-fields summary, .status-card a:not(.linkfy-logo)) {
+  color: var(--ly-accent);
+}
+
+.linkfy-ui .status-card .linkfy-logo {
+  color: var(--ly-ink);
+  text-decoration: none;
+}
+
+.linkfy-ui
+  :is(
+    .auth-card > p,
+    .muted,
+    .draft-note,
+    .studio-label,
+    .studio-local,
+    .editor-link-main p,
+    .field small,
+    .image-field small,
+    .preview-title
+  ) {
+  color: var(--ly-muted);
+}
+
+.linkfy-ui :is(.error-text, .error-notice) {
+  color: var(--ly-danger);
+}
+
+.linkfy-ui :is(.notice, .wa-fields > div, .tabs, .mobile-mode) {
+  color: var(--ly-ink);
+  background: var(--ly-lavender);
+  border-color: var(--ly-rule);
+}
+
+.linkfy-ui :is(.primary, .secondary),
+.member-directory .dialog .secondary {
+  border-radius: 999px;
+}
+
+.linkfy-ui .primary {
+  color: var(--ly-ink);
+  background: var(--ly-lime);
+  border-color: #c7d960;
+}
+
+.linkfy-ui .primary:hover:enabled,
+.linkfy-ui .primary[href]:hover {
+  background: #f3ffab;
+}
+
+.linkfy-ui .secondary,
+.member-directory .dialog .secondary {
+  color: var(--ly-ink);
+  background: var(--ly-white);
+  border-color: var(--ly-rule);
+}
+
+.linkfy-ui .secondary:hover:enabled,
+.linkfy-ui .secondary[href]:hover,
+.member-directory .dialog .secondary:hover:enabled,
+.member-directory .dialog .secondary[href]:hover {
+  background: var(--ly-lavender);
+}
+
+.linkfy-ui .color-input {
+  color: var(--ly-ink);
+  min-height: 48px;
+  border-radius: 12px;
+  border-color: #c8c1d2;
+  background: var(--ly-white);
+}
+.linkfy-ui .icon-color-sample {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  background: var(--ly-stage);
+  border-radius: 8px;
+}
+
+.linkfy-ui .field [aria-invalid='true'] {
+  border-color: var(--ly-danger);
+}
+
+.linkfy-ui :focus-visible,
+.member-directory :focus-visible {
+  outline-color: var(--ly-accent);
+}
+
+.linkfy-ui :is(.check input, .field input[type='range']) {
+  accent-color: var(--ly-accent);
+}
+
+.linkfy-ui :is(.image-sample, .studio-label, .phone-frame) {
+  border-color: var(--ly-rule);
+}
+
+.linkfy-ui .image-sample {
+  color: var(--ly-muted);
+  background: var(--ly-paper);
+}
+
+.linkfy-ui :is(.studio-nav a, .tabs button, .tool-group .btn) {
+  color: var(--ly-muted);
+}
+
+.linkfy-ui
+  :is(
+    .studio-nav a:hover,
+    .studio-nav .active,
+    .tabs [aria-pressed='true'],
+    .tool-group .btn:hover:enabled,
+    .mobile-mode [aria-pressed='true']
+  ) {
+  color: var(--ly-stage);
+  background: var(--ly-lavender);
+}
+
+.member-directory .dialog .notice {
+  color: var(--ly-ink);
+  background: var(--ly-lavender);
+  border-color: var(--ly-rule);
+}
+
+.linkfy-ui :is(.auth-card, .status-card, .editor-panel, .editor-links li),
+.member-directory .dialog {
+  border-radius: 20px;
+  box-shadow:
+    0 2px 4px #31244706,
+    0 9px 28px -22px #38225340;
+}
+.linkfy-ui .auth-card {
+  padding: clamp(24px, 5vw, 40px);
+  gap: 20px;
+  border-radius: 28px;
+  box-shadow: 0 20px 64px -30px #39214746;
+}
+.linkfy-ui .auth-card .linkfy-logo {
+  margin-bottom: 6px;
+}
+.linkfy-ui .auth-card .primary {
+  justify-self: stretch;
+}
+.linkfy-ui .auth-card .back-store {
+  font-weight: 600;
+  padding-block: 4px;
+}
+.linkfy-ui :is(.studio-head, .editor-panel h2, .list-heading h2) {
+  letter-spacing: -0.025em;
+}
+.linkfy-ui .studio-head {
+  box-shadow: 0 1px 0 #2c1e3e08;
+}
+.linkfy-ui .editor-panel {
+  padding: clamp(16px, 2.4vw, 28px);
+}
+.linkfy-ui .field {
+  gap: 7px;
+  align-content: start;
+}
+.linkfy-ui :is(.field label, .field-label, .share-panel label),
+.member-directory .dialog label {
+  color: var(--ly-ink);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  font-weight: 700;
+}
+.linkfy-ui .field :where(input:not([type='color']):not([type='range']), textarea, select),
+.linkfy-ui .share-panel input,
+.member-directory .dialog input {
+  min-height: 48px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid #c8c1d2;
+  background-color: var(--ly-white);
+  color: var(--ly-ink);
+  line-height: 1.45;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.linkfy-ui .field :is(input, textarea)::placeholder {
+  color: #746d80;
+  opacity: 1;
+}
+.linkfy-ui .field select {
+  appearance: none;
+  cursor: pointer;
+  padding-right: 38px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #685b78 50%),
+    linear-gradient(135deg, #685b78 50%, transparent 50%);
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  background-position:
+    calc(100% - 19px) center,
+    calc(100% - 14px) center;
+}
+.linkfy-ui .field :is(input, textarea, select):focus-visible,
+.linkfy-ui .share-panel input:focus-visible,
+.member-directory .dialog input:focus-visible,
+.color-picker:focus-within {
+  outline: 2px solid var(--ly-accent);
+  outline-offset: 2px;
+}
+.linkfy-ui .field :is(input, textarea, select)[aria-invalid='true'] {
+  border-color: var(--ly-danger);
+  background-color: #fff6f7;
+}
+.linkfy-ui .field .error-text {
+  color: var(--ly-danger);
+}
+.linkfy-ui fieldset:disabled :is(input, select, textarea) {
+  cursor: wait;
+  opacity: 0.7;
+}
+.linkfy-ui .field small,
+.linkfy-ui .image-field small {
+  font-size: 0.8rem;
+}
+.linkfy-ui .notice.error-notice,
+.linkfy-ui .notice[role='alert'] {
+  color: #861f37;
+  background: #fff0f3;
+  border-color: #edbbc8;
+}
+.linkfy-ui .field input[type='range'] {
+  width: 100%;
+  min-height: 40px;
+  cursor: pointer;
+}
+.linkfy-ui .check {
+  gap: 9px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.linkfy-ui .check input {
+  appearance: none;
+  width: 36px;
+  height: 22px;
+  flex: none;
+  border-radius: 20px;
+  border: 1px solid #756e80;
+  background: radial-gradient(circle at 10px center, white 7px, transparent 7.6px), #787181;
+}
+.linkfy-ui .check input:checked {
+  border-color: var(--ly-accent);
+  background:
+    radial-gradient(circle at 24px center, white 7px, transparent 7.6px), var(--ly-accent);
+}
+.color-control {
+  display: flex;
+  align-items: center;
+  gap: 6px 10px;
+  flex-wrap: wrap;
+}
+.color-picker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 134px;
+  gap: 9px;
+  min-height: 48px;
+  padding: 7px 12px;
+  border: 1px solid #c8c1d2;
+  border-radius: 12px;
+  background: var(--ly-white);
+  color: var(--ly-ink);
+  font:
+    600 0.83rem/1.3 ui-monospace,
+    monospace;
+}
+.color-picker i {
+  width: 26px;
+  height: 26px;
+  border: 1px solid #0003;
+  border-radius: 8px;
+}
+.color-picker svg {
+  margin-left: auto;
+  color: var(--ly-muted);
+}
+.color-picker input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.color-reset {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 36px;
+  color: var(--ly-accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.password-control {
+  display: block;
+  position: relative;
+}
+.linkfy-ui .password-control input:not([type='color']):not([type='range']) {
+  padding-right: 52px;
+}
+.password-control button {
+  display: grid;
+  place-items: center;
+  position: absolute;
+  inset: 2px 2px 2px auto;
+  width: 44px;
+  border-radius: 10px;
+  color: var(--ly-muted);
+}
+.password-control button:hover {
+  background: var(--ly-lavender);
+}
+.linkfy-ui .image-field {
+  border: 1px dashed #bcb0ca;
+  border-radius: 16px;
+  background: var(--ly-paper);
+  padding: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 9px;
+}
+.linkfy-ui .image-sample {
+  width: 60px;
+  height: 60px;
+  border: 1px solid var(--ly-rule);
+  border-radius: 15px;
+  background: var(--ly-white);
+  color: var(--ly-accent);
+}
+.linkfy-ui .image-sample img {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+}
+.linkfy-ui .image-field[data-folder='avatars'] .image-sample {
+  border-radius: 50%;
+}
+.linkfy-ui .image-field[data-folder='avatars'] img {
+  object-fit: cover;
+}
+.linkfy-ui .preset.dark {
+  color: #fff;
+  background: #232126;
+}
+.linkfy-ui .preset.gradient {
+  color: white;
+}
+.linkfy-ui .preset[aria-pressed='true'] {
+  outline-color: var(--ly-accent);
+  outline-offset: 2px;
+}
+.linkfy-ui :is(.tabs, .mobile-mode) [aria-pressed='true'] {
+  background: var(--ly-white);
+  box-shadow: 0 1px 4px #3b294021;
+}
+.linkfy-ui .share-panel > img,
+.member-directory .dialog .share-panel > img {
+  padding: 5px;
+  border: 1px solid var(--ly-rule);
+  background: white;
+  border-radius: 16px;
+}
+@media (forced-colors: active) {
+  .linkfy-ui .check input,
+  .linkfy-ui .field select {
+    appearance: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .linkfy-ui .field :is(input, textarea, select) {
+    transition: none;
+  }
+}
