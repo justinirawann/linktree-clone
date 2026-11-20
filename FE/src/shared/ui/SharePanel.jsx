@@ -21,15 +21,17 @@ export default function SharePanel({
   const [message, setMessage] = useState(''),
     [copied, setCopied] = useState(false)
   const [qrVariant, setQrVariant] = useState('black')
+  const [qrBackground, setQrBackground] = useState('solid')
   const urlInput = useRef(null)
   const qr = useQuery({
-    queryKey: ['qr', url, logoSrc, qrVariant],
+    queryKey: ['qr', url, logoSrc, qrVariant, qrBackground],
     enabled: Boolean(url) && !isLogoLoading,
-    queryFn: () => createProfileQr(url, logoSrc, qrVariant),
+    queryFn: () => createProfileQr(url, logoSrc, { variant: qrVariant, background: qrBackground }),
   })
   const qrCode = isLogoLoading ? undefined : qr.data
-  const downloadName =
-    qrVariant === 'white' ? qrFilename.replace(/\.png$/i, '') + '-putih.png' : qrFilename
+  const suffix =
+    (qrVariant === 'white' ? '-putih' : '') + (qrBackground === 'transparent' ? '-transparan' : '')
+  const downloadName = suffix ? qrFilename.replace(/\.png$/i, '') + suffix + '.png' : qrFilename
   async function copy() {
     try {
       await navigator.clipboard.writeText(url)
@@ -58,7 +60,7 @@ export default function SharePanel({
   return (
     <div className="share-panel">
       <div className="share-qr">
-        <div className="share-qr-preview" data-variant={qrVariant}>
+        <div className="share-qr-preview" data-variant={qrVariant} data-background={qrBackground}>
           {qrCode && (
             <img
               src={qrCode.png}
@@ -86,6 +88,13 @@ export default function SharePanel({
             </button>
           ))}
         </div>
+        <label className="share-qr-background">
+          Latar PNG
+          <select value={qrBackground} onChange={(event) => setQrBackground(event.target.value)}>
+            <option value="solid">Solid</option>
+            <option value="transparent">Transparan</option>
+          </select>
+        </label>
       </div>
       <div className="share-details">
         {logoSrc && qrCode && !qrCode.hasLogo && (

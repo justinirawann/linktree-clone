@@ -51,9 +51,20 @@ test('owner lokal mengedit, menerbitkan, berbagi QR, lalu menarik publikasi', as
     'aria-pressed',
     'true',
   )
+  await page.getByLabel('Latar PNG').selectOption({ label: 'Transparan' })
+  const whiteQr = page.getByRole('img', { name: 'Kode QR Core Hardware' })
+  expect(
+    await whiteQr.evaluate(async (image) => {
+      await image.decode()
+      const canvas = document.createElement('canvas')
+      const context = canvas.getContext('2d')
+      context.drawImage(image, 0, 0)
+      return context.getImageData(0, 0, 1, 1).data[3]
+    }),
+  ).toBe(0)
   const whiteDownload = page.waitForEvent('download')
   await page.getByRole('link', { name: 'Unduh QR' }).click()
-  expect((await whiteDownload).suggestedFilename()).toBe('core-consign-qr-putih.png')
+  expect((await whiteDownload).suggestedFilename()).toBe('core-consign-qr-putih-transparan.png')
   await page.keyboard.press('Escape')
   await page.goto('/studio/settings')
   await page.getByRole('button', { name: 'Tarik publikasi', exact: true }).click()

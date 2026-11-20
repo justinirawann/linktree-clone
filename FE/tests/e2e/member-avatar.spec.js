@@ -164,7 +164,9 @@ test('ikon pratinjau mengambil metadata sesuai URL dan tetap berguna saat situs 
   await expect(dialog.getByRole('link', { name: 'Buka tautan' })).toHaveAttribute('href', url)
 })
 
-test('foto profil tersimpan dan kedua warna QR PNG dapat dipindai', async ({ page }) => {
+test('QR dengan foto profil dapat dipindai pada kedua warna dan pilihan latar', async ({
+  page,
+}) => {
   await openMemberStudio(page)
   const field = page.getByLabel('Foto profil', { exact: true })
   await field.waitFor({ state: 'attached' })
@@ -190,35 +192,47 @@ test('foto profil tersimpan dan kedua warna QR PNG dapat dipindai', async ({ pag
   const qr = page.getByRole('img', { name: 'Kode QR dengan foto profil Maya' })
   const download = page.getByRole('link', { name: 'Unduh QR' })
   const colors = page.getByRole('group', { name: 'Warna kode QR' })
+  const backdrop = page.getByLabel('Latar PNG')
   await expect(colors.getByRole('button', { name: 'Hitam' })).toHaveAttribute(
     'aria-pressed',
     'true',
   )
-  for (const [label, background, foreground, filename] of [
-    ['Hitam', 255, 0, 'linkfy-qr.png'],
-    ['Putih', 0, 255, 'linkfy-qr-putih.png'],
+  await expect(backdrop).toHaveValue('solid')
+  for (const [label, mode, background, foreground, filename] of [
+    ['Hitam', 'solid', 255, 0, 'linkfy-qr.png'],
+    ['Hitam', 'transparent', 255, 0, 'linkfy-qr-transparan.png'],
+    ['Putih', 'transparent', 0, 255, 'linkfy-qr-putih-transparan.png'],
+    ['Putih', 'solid', 0, 255, 'linkfy-qr-putih.png'],
   ]) {
     await colors.getByRole('button', { name: label }).click()
+    await backdrop.selectOption(mode)
     await expect(download).toHaveAttribute('download', filename)
     await expect(qr).toBeVisible()
     expect(await download.getAttribute('href')).toBe(await qr.getAttribute('src'))
-    const pixels = await qr.evaluate(async (image) => {
+    const pixels = await qr.evaluate(async (image, background) => {
       await image.decode()
       const canvas = document.createElement('canvas')
       canvas.width = image.naturalWidth
       canvas.height = image.naturalHeight
       const context = canvas.getContext('2d')
       context.drawImage(image, 0, 0)
+      const corner = [...context.getImageData(0, 0, 1, 1).data]
+      const center = [...context.getImageData(canvas.width >> 1, canvas.height >> 1, 1, 1).data]
+      context.globalCompositeOperation = 'destination-over'
+      context.fillStyle = background === 255 ? '#fff' : '#000'
+      context.fillRect(0, 0, canvas.width, canvas.height)
       const { data, width, height } = context.getImageData(0, 0, canvas.width, canvas.height)
       let bytes = ''
       for (const value of data) bytes += String.fromCharCode(value)
-      return { bytes: btoa(bytes), width, height }
-    })
+      return { bytes: btoa(bytes), width, height, corner, center }
+    }, background)
     const imageData = new Uint8ClampedArray(Buffer.from(pixels.bytes, 'base64'))
-    const center = (Math.floor(pixels.height / 2) * pixels.width + Math.floor(pixels.width / 2)) * 4
-    expect([...imageData.slice(0, 4)]).toEqual([background, background, background, 255])
-    expect(imageData[center]).toBeGreaterThan(170)
-    expect(imageData[center + 1]).toBeLessThan(90)
+    expect(pixels.corner).toEqual(
+      mode === 'solid' ? [background, background, background, 255] : [0, 0, 0, 0],
+    )
+    expect(pixels.center[0]).toBeGreaterThan(170)
+    expect(pixels.center[1]).toBeLessThan(90)
+    expect(pixels.center[3]).toBe(255)
     const decoded = jsQR(imageData, pixels.width, pixels.height)
     expect(decoded?.data).toBe(SITE_URL + '/u/maya')
     const finder = decoded.location.topLeftFinderPattern
@@ -237,10 +251,11 @@ test('foto profil tersimpan dan kedua warna QR PNG dapat dipindai', async ({ pag
   await page.getByRole('button', { name: 'Bagikan' }).click()
   const dialog = page.getByRole('dialog')
   await dialog.getByRole('button', { name: 'Putih' }).click()
+  await dialog.getByLabel('Latar PNG').selectOption('transparent')
   await expect(dialog.getByRole('img', { name: 'Kode QR dengan foto profil Maya' })).toBeVisible()
   await expect(dialog.getByRole('link', { name: 'Unduh QR' })).toHaveAttribute(
     'download',
-    'linkfy-qr-putih.png',
+    'linkfy-qr-putih-transparan.png',
   )
 })
 

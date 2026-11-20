@@ -1,6 +1,7 @@
 const QUIET_ZONE = 4
 const TARGET_WIDTH = 480
 const LOGO_FRACTION = 0.2
+const TRANSPARENT = '#00000000'
 const QR_COLORS = {
   black: { dark: '#000000', light: '#ffffff' },
   white: { dark: '#ffffff', light: '#000000' },
@@ -15,10 +16,14 @@ async function loadLogo(source) {
 }
 
 function drawLogo(context, image, center, radius, backgroundColor) {
-  context.fillStyle = backgroundColor
+  const isTransparent = backgroundColor === TRANSPARENT
+  context.save()
+  if (isTransparent) context.globalCompositeOperation = 'destination-out'
+  context.fillStyle = isTransparent ? '#000000' : backgroundColor
   context.beginPath()
   context.arc(center, center, radius, 0, Math.PI * 2)
   context.fill()
+  context.restore()
 
   const sourceSize = Math.min(image.naturalWidth, image.naturalHeight)
   const photoRadius = radius * 0.82
@@ -46,15 +51,30 @@ function preserveReservedModules(context, modules, scale, center, radius, color)
   for (let row = first; row <= last; row += 1) {
     for (let column = first; column <= last; column += 1) {
       if (!modules.isReserved(row, column)) continue
-      context.fillStyle = modules.get(row, column) ? color.dark : color.light
-      context.fillRect((column + QUIET_ZONE) * scale, (row + QUIET_ZONE) * scale, scale, scale)
+      const x = (column + QUIET_ZONE) * scale
+      const y = (row + QUIET_ZONE) * scale
+      const isFilled = modules.get(row, column)
+      if (!isFilled && color.light === TRANSPARENT) {
+        context.clearRect(x, y, scale, scale)
+      } else {
+        context.fillStyle = isFilled ? color.dark : color.light
+        context.fillRect(x, y, scale, scale)
+      }
     }
   }
 }
 
-export async function createProfileQr(url, logoSrc, variant = 'black') {
+export async function createProfileQr(
+  url,
+  logoSrc,
+  { variant = 'black', background = 'solid' } = {},
+) {
   const { default: qr } = await import('qrcode')
-  const color = QR_COLORS[variant]
+  const palette = QR_COLORS[variant]
+  const color = {
+    dark: palette.dark,
+    light: background === 'transparent' ? TRANSPARENT : palette.light,
+  }
   const renderWithoutLogo = async (errorCorrectionLevel) => ({
     png: await qr.toDataURL(url, {
       width: TARGET_WIDTH,
