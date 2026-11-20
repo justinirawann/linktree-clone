@@ -1,6 +1,10 @@
 const QUIET_ZONE = 4
 const TARGET_WIDTH = 480
 const LOGO_FRACTION = 0.2
+const QR_COLORS = {
+  black: { dark: '#000000', light: '#ffffff' },
+  white: { dark: '#ffffff', light: '#000000' },
+}
 
 async function loadLogo(source) {
   const image = new Image()
@@ -10,8 +14,8 @@ async function loadLogo(source) {
   return image
 }
 
-function drawLogo(context, image, center, radius) {
-  context.fillStyle = '#ffffff'
+function drawLogo(context, image, center, radius, backgroundColor) {
+  context.fillStyle = backgroundColor
   context.beginPath()
   context.arc(center, center, radius, 0, Math.PI * 2)
   context.fill()
@@ -36,30 +40,31 @@ function drawLogo(context, image, center, radius) {
   context.restore()
 }
 
-function preserveReservedModules(context, modules, scale, center, radius) {
+function preserveReservedModules(context, modules, scale, center, radius, color) {
   const first = Math.max(0, Math.floor((center - radius) / scale) - QUIET_ZONE)
   const last = Math.min(modules.size - 1, Math.floor((center + radius) / scale) - QUIET_ZONE)
   for (let row = first; row <= last; row += 1) {
     for (let column = first; column <= last; column += 1) {
       if (!modules.isReserved(row, column)) continue
-      context.fillStyle = modules.get(row, column) ? '#000000' : '#ffffff'
+      context.fillStyle = modules.get(row, column) ? color.dark : color.light
       context.fillRect((column + QUIET_ZONE) * scale, (row + QUIET_ZONE) * scale, scale, scale)
     }
   }
 }
 
-export async function createProfileQr(url, logoSrc) {
+export async function createProfileQr(url, logoSrc, variant = 'black') {
   const { default: qr } = await import('qrcode')
-  if (!logoSrc) {
-    return {
-      png: await qr.toDataURL(url, {
-        width: TARGET_WIDTH,
-        margin: QUIET_ZONE,
-        errorCorrectionLevel: 'M',
-      }),
-      hasLogo: false,
-    }
-  }
+  const color = QR_COLORS[variant]
+  const renderWithoutLogo = async (errorCorrectionLevel) => ({
+    png: await qr.toDataURL(url, {
+      width: TARGET_WIDTH,
+      margin: QUIET_ZONE,
+      errorCorrectionLevel,
+      color,
+    }),
+    hasLogo: false,
+  })
+  if (!logoSrc) return renderWithoutLogo('M')
 
   const symbol = qr.create(url, { errorCorrectionLevel: 'H' })
   const scale = Math.max(1, Math.floor(TARGET_WIDTH / (symbol.modules.size + QUIET_ZONE * 2)))
@@ -69,23 +74,17 @@ export async function createProfileQr(url, logoSrc) {
     errorCorrectionLevel: 'H',
     version: symbol.version,
     maskPattern: symbol.maskPattern,
+    color,
   })
   try {
     const image = await loadLogo(logoSrc)
     const center = canvas.width / 2
     const radius = (symbol.modules.size * scale * LOGO_FRACTION) / 2
     const context = canvas.getContext('2d')
-    drawLogo(context, image, center, radius)
-    preserveReservedModules(context, symbol.modules, scale, center, radius)
+    drawLogo(context, image, center, radius, color.light)
+    preserveReservedModules(context, symbol.modules, scale, center, radius, color)
     return { png: canvas.toDataURL('image/png'), hasLogo: true }
   } catch {
-    return {
-      png: await qr.toDataURL(url, {
-        width: TARGET_WIDTH,
-        margin: QUIET_ZONE,
-        errorCorrectionLevel: 'H',
-      }),
-      hasLogo: false,
-    }
+    return renderWithoutLogo('H')
   }
 }

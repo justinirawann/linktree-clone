@@ -402,13 +402,6 @@
   background: var(--ly-white);
   box-shadow: 0 1px 4px #3b294021;
 }
-.linkfy-ui .share-panel > img,
-.member-directory .dialog .share-panel > img {
-  padding: 5px;
-  border: 1px solid var(--ly-rule);
-  background: white;
-  border-radius: 16px;
-}
 @media (forced-colors: active) {
   .linkfy-ui .check input,
   .linkfy-ui .field select {

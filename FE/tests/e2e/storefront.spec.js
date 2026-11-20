@@ -45,6 +45,15 @@ test('owner lokal mengedit, menerbitkan, berbagi QR, lalu menarik publikasi', as
   const download = page.waitForEvent('download')
   await page.getByRole('link', { name: 'Unduh QR' }).click()
   expect((await download).suggestedFilename()).toBe('core-consign-qr.png')
+  const colors = page.getByRole('group', { name: 'Warna kode QR' })
+  await colors.getByRole('button', { name: 'Putih' }).press('Space')
+  await expect(colors.getByRole('button', { name: 'Putih' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
+  const whiteDownload = page.waitForEvent('download')
+  await page.getByRole('link', { name: 'Unduh QR' }).click()
+  expect((await whiteDownload).suggestedFilename()).toBe('core-consign-qr-putih.png')
   await page.keyboard.press('Escape')
   await page.goto('/studio/settings')
   await page.getByRole('button', { name: 'Tarik publikasi', exact: true }).click()

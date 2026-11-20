@@ -929,16 +929,9 @@ button:disabled {
   gap: 14px;
   margin-top: 15px;
 }
-.share-panel > img {
-  justify-self: center;
-  border-radius: 9px;
-}
 .share-panel label {
   display: grid;
   gap: 5px;
-}
-.share-panel > p:empty {
-  display: none;
 }
 .preview-pane {
   position: sticky;

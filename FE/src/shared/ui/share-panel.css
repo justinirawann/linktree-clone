@@ -1,0 +1,96 @@
+.share-qr {
+  display: grid;
+  gap: 8px;
+  width: min(100%, 180px);
+  margin-inline: auto;
+}
+
+.share-qr-preview {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--ly-rule);
+  border-radius: 14px;
+  background: #fff;
+  color: #211b2c;
+  text-align: center;
+}
+
+.share-qr-preview[data-variant='white'] {
+  background: #000;
+  color: #fff;
+}
+
+.share-qr-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.share-qr-preview p {
+  margin: 0;
+  padding: 8px;
+  font-size: 0.83rem;
+}
+
+.share-qr-colors {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--ly-rule);
+  border-radius: 12px;
+  background: var(--ly-paper);
+  color: var(--ly-ink);
+}
+
+.share-qr-colors button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 0.81rem;
+  font-weight: 700;
+}
+
+.share-qr-colors button:hover {
+  background: var(--ly-lavender);
+}
+
+.share-qr-colors button[aria-pressed='true'] {
+  border-color: var(--ly-ink);
+  background: var(--ly-ink);
+  color: white;
+}
+
+.share-qr-colors button > span {
+  width: 12px;
+  height: 12px;
+  border: 1px solid #867e91;
+  border-radius: 3px;
+  background: #000;
+}
+
+.share-qr-colors button[data-variant='white'] > span {
+  background: #fff;
+}
+
+.share-details {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.share-details > p:empty {
+  display: none;
+}
+
+@media (forced-colors: active) {
+  .share-qr-colors button[aria-pressed='true'] {
+    border-color: Highlight;
+  }
+}

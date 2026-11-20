@@ -4,6 +4,13 @@ import { Check, Copy, Download, Share2 } from 'lucide-react'
 import { publicPageUrl } from '../lib/env'
 import { createProfileQr } from '../lib/profileQr'
 import { Button } from './Controls'
+import './share-panel.css'
+
+const QR_VARIANTS = [
+  { value: 'black', label: 'Hitam' },
+  { value: 'white', label: 'Putih' },
+]
+
 export default function SharePanel({
   name,
   url = publicPageUrl,
@@ -13,12 +20,16 @@ export default function SharePanel({
 }) {
   const [message, setMessage] = useState(''),
     [copied, setCopied] = useState(false)
+  const [qrVariant, setQrVariant] = useState('black')
   const urlInput = useRef(null)
   const qr = useQuery({
-    queryKey: ['qr', url, logoSrc],
+    queryKey: ['qr', url, logoSrc, qrVariant],
     enabled: Boolean(url) && !isLogoLoading,
-    queryFn: () => createProfileQr(url, logoSrc),
+    queryFn: () => createProfileQr(url, logoSrc, qrVariant),
   })
+  const qrCode = isLogoLoading ? undefined : qr.data
+  const downloadName =
+    qrVariant === 'white' ? qrFilename.replace(/\.png$/i, '') + '-putih.png' : qrFilename
   async function copy() {
     try {
       await navigator.clipboard.writeText(url)
@@ -46,41 +57,63 @@ export default function SharePanel({
     )
   return (
     <div className="share-panel">
-      {qr.data && (
-        <img
-          src={qr.data.png}
-          alt={qr.data.hasLogo ? 'Kode QR dengan foto profil ' + name : 'Kode QR ' + name}
-          width="180"
-          height="180"
-        />
-      )}
-      {qr.isPending && <p role="status">Membuat kode QR…</p>}
-      {logoSrc && qr.data && !qr.data.hasLogo && (
-        <p role="status">Foto belum bisa dimuat. Kode QR biasa tetap tersedia.</p>
-      )}
-      {qr.isError && <Button onClick={() => qr.refetch()}>Muat ulang QR</Button>}
-      <label>
-        Alamat publik
-        <input ref={urlInput} readOnly value={url} onFocus={(e) => e.target.select()} />
-      </label>
-      <div className="button-row">
-        <Button onClick={copy}>
-          {copied ? <Check size={16} /> : <Copy size={16} />}Salin tautan
-        </Button>
-        {navigator.share && (
-          <Button onClick={share}>
-            <Share2 size={16} />
-            Bagikan
-          </Button>
-        )}
-        {qr.data && (
-          <a className="btn secondary" href={qr.data.png} download={qrFilename}>
-            <Download size={16} />
-            Unduh QR
-          </a>
-        )}
+      <div className="share-qr">
+        <div className="share-qr-preview" data-variant={qrVariant}>
+          {qrCode && (
+            <img
+              src={qrCode.png}
+              alt={qrCode.hasLogo ? 'Kode QR dengan foto profil ' + name : 'Kode QR ' + name}
+              width="180"
+              height="180"
+            />
+          )}
+          {(isLogoLoading || qr.isPending) && <p role="status">Membuat kode QR…</p>}
+          {!qrCode && !isLogoLoading && qr.isError && (
+            <Button onClick={() => qr.refetch()}>Muat ulang QR</Button>
+          )}
+        </div>
+        <div className="share-qr-colors" role="group" aria-label="Warna kode QR">
+          {QR_VARIANTS.map(({ value, label }) => (
+            <button
+              key={value}
+              type="button"
+              data-variant={value}
+              aria-pressed={qrVariant === value}
+              onClick={() => setQrVariant(value)}
+            >
+              <span aria-hidden="true" />
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
-      <p role="status">{message}</p>
+      <div className="share-details">
+        {logoSrc && qrCode && !qrCode.hasLogo && (
+          <p role="status">Foto belum bisa dimuat. Kode QR biasa tetap tersedia.</p>
+        )}
+        <label>
+          Alamat publik
+          <input ref={urlInput} readOnly value={url} onFocus={(e) => e.target.select()} />
+        </label>
+        <div className="button-row">
+          <Button onClick={copy}>
+            {copied ? <Check size={16} /> : <Copy size={16} />}Salin tautan
+          </Button>
+          {navigator.share && (
+            <Button onClick={share}>
+              <Share2 size={16} />
+              Bagikan
+            </Button>
+          )}
+          {qrCode && (
+            <a className="btn secondary" href={qrCode.png} download={downloadName}>
+              <Download size={16} />
+              Unduh QR
+            </a>
+          )}
+        </div>
+        <p role="status">{message}</p>
+      </div>
     </div>
   )
 }

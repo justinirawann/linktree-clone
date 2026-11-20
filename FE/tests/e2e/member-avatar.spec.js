@@ -164,7 +164,7 @@ test('ikon pratinjau mengambil metadata sesuai URL dan tetap berguna saat situs 
   await expect(dialog.getByRole('link', { name: 'Buka tautan' })).toHaveAttribute('href', url)
 })
 
-test('foto profil tersimpan dan menjadi pusat QR PNG yang dapat dipindai', async ({ page }) => {
+test('foto profil tersimpan dan kedua warna QR PNG dapat dipindai', async ({ page }) => {
   await openMemberStudio(page)
   const field = page.getByLabel('Foto profil', { exact: true })
   await field.waitFor({ state: 'attached' })
@@ -188,32 +188,60 @@ test('foto profil tersimpan dan menjadi pusat QR PNG yang dapat dipindai', async
   await page.reload()
 
   const qr = page.getByRole('img', { name: 'Kode QR dengan foto profil Maya' })
-  await expect(qr).toBeVisible()
   const download = page.getByRole('link', { name: 'Unduh QR' })
-  expect(await download.getAttribute('href')).toBe(await qr.getAttribute('src'))
-  const pixels = await qr.evaluate(async (image) => {
-    await image.decode()
-    const canvas = document.createElement('canvas')
-    canvas.width = image.naturalWidth
-    canvas.height = image.naturalHeight
-    const context = canvas.getContext('2d')
-    context.drawImage(image, 0, 0)
-    const { data, width, height } = context.getImageData(0, 0, canvas.width, canvas.height)
-    let bytes = ''
-    for (const value of data) bytes += String.fromCharCode(value)
-    return { bytes: btoa(bytes), width, height }
-  })
-  const imageData = new Uint8ClampedArray(Buffer.from(pixels.bytes, 'base64'))
-  const center = (Math.floor(pixels.height / 2) * pixels.width + Math.floor(pixels.width / 2)) * 4
-  expect(imageData[center]).toBeGreaterThan(170)
-  expect(imageData[center + 1]).toBeLessThan(90)
-  expect(jsQR(imageData, pixels.width, pixels.height)?.data).toBe(SITE_URL + '/u/maya')
+  const colors = page.getByRole('group', { name: 'Warna kode QR' })
+  await expect(colors.getByRole('button', { name: 'Hitam' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
+  for (const [label, background, foreground, filename] of [
+    ['Hitam', 255, 0, 'linkfy-qr.png'],
+    ['Putih', 0, 255, 'linkfy-qr-putih.png'],
+  ]) {
+    await colors.getByRole('button', { name: label }).click()
+    await expect(download).toHaveAttribute('download', filename)
+    await expect(qr).toBeVisible()
+    expect(await download.getAttribute('href')).toBe(await qr.getAttribute('src'))
+    const pixels = await qr.evaluate(async (image) => {
+      await image.decode()
+      const canvas = document.createElement('canvas')
+      canvas.width = image.naturalWidth
+      canvas.height = image.naturalHeight
+      const context = canvas.getContext('2d')
+      context.drawImage(image, 0, 0)
+      const { data, width, height } = context.getImageData(0, 0, canvas.width, canvas.height)
+      let bytes = ''
+      for (const value of data) bytes += String.fromCharCode(value)
+      return { bytes: btoa(bytes), width, height }
+    })
+    const imageData = new Uint8ClampedArray(Buffer.from(pixels.bytes, 'base64'))
+    const center = (Math.floor(pixels.height / 2) * pixels.width + Math.floor(pixels.width / 2)) * 4
+    expect([...imageData.slice(0, 4)]).toEqual([background, background, background, 255])
+    expect(imageData[center]).toBeGreaterThan(170)
+    expect(imageData[center + 1]).toBeLessThan(90)
+    const decoded = jsQR(imageData, pixels.width, pixels.height)
+    expect(decoded?.data).toBe(SITE_URL + '/u/maya')
+    const finder = decoded.location.topLeftFinderPattern
+    const finderOffset = (Math.floor(finder.y) * pixels.width + Math.floor(finder.x)) * 4
+    expect([...imageData.slice(finderOffset, finderOffset + 4)]).toEqual([
+      foreground,
+      foreground,
+      foreground,
+      255,
+    ])
+  }
 
   await page.getByRole('link', { name: 'Lihat halaman publik' }).click()
   await expect(page).toHaveURL(SITE_URL + '/u/maya')
   await expect(page.getByRole('img', { name: 'Foto profil Maya', exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Bagikan' }).click()
-  await expect(page.getByRole('img', { name: 'Kode QR dengan foto profil Maya' })).toBeVisible()
+  const dialog = page.getByRole('dialog')
+  await dialog.getByRole('button', { name: 'Putih' }).click()
+  await expect(dialog.getByRole('img', { name: 'Kode QR dengan foto profil Maya' })).toBeVisible()
+  await expect(dialog.getByRole('link', { name: 'Unduh QR' })).toHaveAttribute(
+    'download',
+    'linkfy-qr-putih.png',
+  )
 })
 
 test('warna, bentuk dan efek dibagikan persis seperti pratinjau', async ({ page }) => {

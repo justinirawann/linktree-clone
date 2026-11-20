@@ -154,9 +154,6 @@
 .editor-surface .share-panel {
   align-items: start;
 }
-.editor-surface .share-panel > img {
-  border-radius: 14px;
-}
 .editor-surface .editor-links li {
   background: var(--ly-white);
   border: 1px solid var(--editor-rule);
@@ -242,16 +239,9 @@
   .editor-social-fields {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .editor-surface .share-panel:has(> img) {
+  .editor-surface .share-panel {
     grid-template-columns: 150px minmax(0, 1fr);
     align-content: start;
     column-gap: 20px;
-  }
-  .editor-surface .share-panel > img {
-    grid-column: 1;
-    grid-row: 1 / span 3;
-  }
-  .editor-surface .share-panel:has(> img) > :not(img) {
-    grid-column: 2;
   }
 }
