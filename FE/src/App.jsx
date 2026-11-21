@@ -1,8 +1,21 @@
 import { lazy, Suspense, useEffect } from 'react'
-import { createBrowserRouter, RouterProvider, Outlet, useLocation, Link } from 'react-router-dom'
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Outlet,
+  useLocation,
+  useParams,
+  Link,
+  Navigate,
+} from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { canonicalUrl, localStudio } from './shared/lib/env'
-import { PUBLIC_PAGE_PATH } from './shared/lib/routes'
+import {
+  PUBLIC_PAGE_PATH,
+  isMemberSlug,
+  isReservedMemberSlug,
+  memberPagePath,
+} from './shared/lib/routes'
 import { StatusPage } from './shared/ui/Controls'
 import { LinkfyLogo } from './shared/ui/LinkfyLogo'
 const LandingPage = lazy(() => import('./pages/LandingPage')),
@@ -13,12 +26,36 @@ const LandingPage = lazy(() => import('./pages/LandingPage')),
   MemberStudioPage = lazy(() => import('./pages/MemberStudioPage')),
   AnalyticsPage = lazy(() => import('./pages/AnalyticsPage')),
   MemberPublicPage = lazy(() => import('./pages/MemberPublicPage'))
+
+function NotFoundPage() {
+  return (
+    <StatusPage className="linkfy-ui" brand={<LinkfyLogo />} title="Halaman tidak ditemukan">
+      <Link to="/">Kembali ke Linkfy</Link>
+    </StatusPage>
+  )
+}
+
+function MemberRoute({ legacy = false }) {
+  const { slug } = useParams()
+  const { pathname, search, hash } = useLocation()
+  const username = slug.toLowerCase()
+  if (!isMemberSlug(username) || (!legacy && isReservedMemberSlug(username)))
+    return <NotFoundPage />
+
+  const canonicalPath = memberPagePath(username)
+  if (pathname !== canonicalPath) {
+    return <Navigate replace to={{ pathname: canonicalPath, search, hash }} />
+  }
+  return <MemberPublicPage />
+}
+
 function Layout() {
   const location = useLocation()
   useEffect(() => {
     const path = location.pathname.replace(/\/$/, '') || '/'
     const isStore = path === PUBLIC_PAGE_PATH
-    const isMemberPage = /^\/u\/[a-z0-9-]+$/.test(path)
+    const memberSlug = path.startsWith('/u/') ? path.slice(3) : path.slice(1)
+    const isMemberPage = isMemberSlug(memberSlug) && path === memberPagePath(memberSlug)
     const isHome = path === '/'
     const meta = document.querySelector('meta[name="robots"]')
     if (meta) meta.content = isHome || isStore || isMemberPage ? 'index,follow' : 'noindex,nofollow'
@@ -65,7 +102,7 @@ const router = createBrowserRouter([
       { path: '/dashboard', element: <MemberStudioPage /> },
       { path: '/dashboard/analytics', element: <AnalyticsPage /> },
       { path: '/admin/analytics', element: <AnalyticsPage ownerStore /> },
-      { path: '/u/:slug', element: <MemberPublicPage /> },
+      { path: '/u/:slug', element: <MemberRoute legacy /> },
       { path: '/admin/login', element: <AuthPage /> },
       { path: '/admin/reset-password', element: <AuthPage reset /> },
       ...sections.map((section) => ({
@@ -78,14 +115,8 @@ const router = createBrowserRouter([
             element: <StudioPage local section={section} />,
           }))
         : []),
-      {
-        path: '*',
-        element: (
-          <StatusPage className="linkfy-ui" brand={<LinkfyLogo />} title="Halaman tidak ditemukan">
-            <Link to="/">Kembali ke Linkfy</Link>
-          </StatusPage>
-        ),
-      },
+      { path: '/:slug', element: <MemberRoute /> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ])

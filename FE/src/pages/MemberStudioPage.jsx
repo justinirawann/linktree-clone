@@ -11,6 +11,7 @@ import {
   ScanLine,
   Smartphone,
   UserRound,
+  X,
 } from 'lucide-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, Navigate, useLocation } from 'react-router-dom'
@@ -29,6 +30,7 @@ import { ChannelIcon, Directory } from '../features/storefront'
 import { EMPTY_LINK } from '../shared/lib/defaults'
 import { hasSupabase } from '../shared/lib/env'
 import { linkSchema } from '../shared/lib/rules'
+import { isMemberSlug, isReservedMemberSlug } from '../shared/lib/routes'
 import { Button, Dialog, Field, StatusPage } from '../shared/ui/Controls'
 import { LinkfyLogo } from '../shared/ui/LinkfyLogo'
 import { ImageField } from '../shared/ui/ImageField'
@@ -44,18 +46,58 @@ function CreatePage({ userId }) {
   const cache = useQueryClient()
   const [name, setName] = useState('')
   const [slug, setSlug] = useState('')
+  const [checkedSlug, setCheckedSlug] = useState('')
+  const reserved = isReservedMemberSlug(slug)
+  const canCheck = isMemberSlug(slug) && !reserved
+  useEffect(() => {
+    if (!canCheck) return
+    const timer = window.setTimeout(() => setCheckedSlug(slug), 350)
+    return () => window.clearTimeout(timer)
+  }, [canCheck, slug])
+
+  const availability = useQuery({
+    queryKey: [EDITOR_KEY, userId, 'slug-taken', checkedSlug],
+    queryFn: ({ signal }) => members.slugTaken(checkedSlug, signal),
+    enabled: canCheck && slug === checkedSlug,
+    staleTime: 0,
+    retry: false,
+  })
   const create = useMutation({
     mutationFn: () => members.create(slug, name),
     onSuccess: (page) => cache.setQueryData([EDITOR_KEY, userId], page),
   })
+  const checking = canCheck && (slug !== checkedSlug || availability.isFetching)
+  const taken =
+    canCheck &&
+    ((slug === checkedSlug && availability.data === true) || create.error?.code === '23505')
+  const canCreate =
+    canCheck &&
+    !checking &&
+    !taken &&
+    (availability.data === false || availability.isError) &&
+    !create.isPending
+  const available =
+    canCheck && !checking && !taken && !availability.isError && availability.data === false
+  const unavailable = reserved || taken
+  const statusTone = unavailable ? 'unavailable' : available ? 'available' : undefined
+  let status = ''
+  if (reserved) status = 'Alamat ini dipakai oleh Linkfy. Pilih alamat lain.'
+  else if (taken) status = 'Username ini sudah dipakai. Pilih username lain.'
+  else if (checking) status = 'Mengecek ketersediaan…'
+  else if (canCheck && ['PGRST202', '42883'].includes(availability.error?.code))
+    status = 'Cek otomatis belum aktif. Alamat tetap diperiksa saat halaman dibuat.'
+  else if (canCheck && availability.isError)
+    status = 'Pengecekan gagal. Alamat akan dicek saat halaman dibuat.'
+  else if (available) status = 'Username tersedia.'
 
   return (
     <section className="editor-panel editor-surface member-create">
       <EditorHeading icon={UserRound}>Buat halamanmu</EditorHeading>
+      <p className="muted">Pilih username untuk alamat publik halaman Linkfy-mu.</p>
       <form
         onSubmit={(event) => {
           event.preventDefault()
-          if (!create.isPending) create.mutate()
+          if (canCreate) create.mutate()
         }}
       >
         <fieldset disabled={create.isPending}>
@@ -71,30 +113,50 @@ function CreatePage({ userId }) {
             )}
           </Field>
           <Field
-            label="Alamat halaman"
+            label="Username untuk alamat halaman"
             hint="3–32 karakter. Gunakan huruf kecil, angka, atau tanda hubung di antara kata."
           >
             {(props) => (
-              <input
-                {...props}
-                required
-                minLength={3}
-                maxLength={32}
-                pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
-                value={slug}
-                onChange={(event) => setSlug(event.target.value.toLowerCase())}
-              />
+              <div className="member-address-input">
+                <span id={props.id + '-domain'}>{window.location.host}/</span>
+                <input
+                  {...props}
+                  aria-invalid={unavailable}
+                  aria-describedby={`${props.id}-domain ${props['aria-describedby']} member-slug-status`}
+                  required
+                  minLength={3}
+                  maxLength={32}
+                  pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  placeholder="nama-kamu"
+                  value={slug}
+                  onChange={(event) => {
+                    setSlug(event.target.value.trim().toLowerCase())
+                    if (create.isError) create.reset()
+                  }}
+                />
+              </div>
             )}
           </Field>
-          {slug && <p className="muted">Alamatmu {memberPagePath(slug)}</p>}
-          {create.isError && (
+          <p
+            id="member-slug-status"
+            role="status"
+            className="member-slug-status"
+            data-tone={statusTone}
+          >
+            {available && <Check size={16} aria-hidden="true" />}
+            {unavailable && <X size={16} aria-hidden="true" />}
+            {status}
+          </p>
+          {create.isError && create.error.code !== '23505' && (
             <p role="alert" className="error-text">
-              {create.error.code === '23505'
-                ? 'Alamat ini sudah dipakai. Pilih alamat lain.'
+              {create.error.message === 'reserved_member_slug'
+                ? 'Alamat ini dipakai oleh Linkfy. Pilih alamat lain.'
                 : 'Halaman belum bisa dibuat. Periksa nama dan alamat, lalu coba lagi.'}
             </p>
           )}
-          <Button variant="primary" type="submit">
+          <Button variant="primary" type="submit" disabled={!canCreate}>
             Buat halaman
           </Button>
         </fieldset>

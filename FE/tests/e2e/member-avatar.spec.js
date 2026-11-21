@@ -9,7 +9,7 @@ let server
 test.beforeAll(async () => {
   process.env.VITE_SUPABASE_URL = FIXTURE_URL
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ui_fixture'
-  process.env.VITE_SITE_URL = SITE_URL
+  process.env.VITE_SITE_URL = 'https://canonical.linkfy.test'
   server = await createServer({
     cacheDir: 'node_modules/.vite-member-e2e',
     server: { host: '127.0.0.1', port: 5193, strictPort: true },
@@ -24,7 +24,10 @@ test.afterAll(async () => {
   delete process.env.VITE_SITE_URL
 })
 
-async function openMemberStudio(page, { legacy = false } = {}) {
+async function openMemberStudio(
+  page,
+  { legacy = false, withoutPage = false, slugCheckMissing = false } = {},
+) {
   const user = {
     id: '10000000-0000-4000-8000-000000000001',
     email: 'maya@linkfy.test',
@@ -55,6 +58,7 @@ async function openMemberStudio(page, { legacy = false } = {}) {
       },
     ],
   }
+  if (withoutPage) savedPage = null
   const files = new Map()
   const activity = []
   await page.route(FIXTURE_URL + '/**', async (route) => {
@@ -114,7 +118,27 @@ async function openMemberStudio(page, { legacy = false } = {}) {
         },
       })
     } else if (endpoint.endsWith('/member_pages')) {
-      await route.fulfill({ json: [savedPage] })
+      await route.fulfill({ json: savedPage ? [savedPage] : [] })
+    } else if (endpoint.endsWith('/member_slug_taken')) {
+      if (slugCheckMissing) await route.fulfill({ status: 404, json: { code: 'PGRST202' } })
+      else await route.fulfill({ json: request.postDataJSON().chosen_slug === 'maya' })
+    } else if (endpoint.endsWith('/create_member_page')) {
+      const { chosen_slug, chosen_name } = request.postDataJSON()
+      if (chosen_slug === 'maya' || chosen_slug === 'maya-balap') {
+        await route.fulfill({ status: 409, json: { code: '23505' } })
+      } else {
+        savedPage = {
+          slug: chosen_slug,
+          display_name: chosen_name,
+          bio: '',
+          theme: 'light',
+          published: false,
+          revision: 1,
+          avatar_path: null,
+          links: [],
+        }
+        await route.fulfill({ json: savedPage })
+      }
     } else if (endpoint.endsWith('/save_member_page')) {
       const {
         chosen_avatar_path,
@@ -258,7 +282,7 @@ test('QR dengan foto profil dapat dipindai pada kedua warna dan pilihan latar', 
     expect(pixels.center[1]).toBeLessThan(90)
     expect(pixels.center[3]).toBe(255)
     const decoded = jsQR(imageData, pixels.width, pixels.height)
-    expect(decoded?.data).toBe(SITE_URL + '/u/maya?ref=qr')
+    expect(decoded?.data).toBe(SITE_URL + '/maya?ref=qr')
     const finder = decoded.location.topLeftFinderPattern
     const finderOffset = (Math.floor(finder.y) * pixels.width + Math.floor(finder.x)) * 4
     expect([...imageData.slice(finderOffset, finderOffset + 4)]).toEqual([
@@ -270,7 +294,7 @@ test('QR dengan foto profil dapat dipindai pada kedua warna dan pilihan latar', 
   }
 
   await page.getByRole('link', { name: 'Lihat halaman publik' }).click()
-  await expect(page).toHaveURL(SITE_URL + '/u/maya')
+  await expect(page).toHaveURL(SITE_URL + '/maya')
   await expect(page.getByRole('img', { name: 'Foto profil Maya', exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Bagikan' }).click()
   const dialog = page.getByRole('dialog')
@@ -295,6 +319,7 @@ test('dashboard menampilkan kunjungan QR dan klik, lalu mengganti rentang', asyn
       request.url().endsWith('/record_page_analytics') && !request.postDataJSON().link_id,
   )
   await page.goto(SITE_URL + '/u/maya?ref=qr')
+  await expect(page).toHaveURL(SITE_URL + '/maya?ref=qr')
   expect((await recorded).postDataJSON()).toMatchObject({ page_slug: 'maya', visit_source: 'qr' })
   const destination = page.getByRole('link', { name: 'Portofolio' })
   await destination.evaluate((link) =>
@@ -424,7 +449,7 @@ test('kaca mengikuti tema publik di layar ponsel dan pilihan kurangi transparans
     await page.route(FIXTURE_URL + '/rest/v1/rpc/get_member_page', (route) =>
       route.fulfill({ json: profile }),
     )
-    await page.goto(SITE_URL + '/u/' + preset)
+    await page.goto(SITE_URL + '/' + preset)
     const card = page.getByRole('link', { name: 'Instagram' })
     await expect(card).toBeVisible()
     await expect(card).toHaveCSS('backdrop-filter', /blur\(/)
@@ -513,6 +538,7 @@ for (const registration of [
 ]) {
   test('pendaftaran menampilkan hasil yang benar untuk ' + registration.name, async ({ page }) => {
     await page.route(FIXTURE_URL + '/auth/v1/signup**', (route) => {
+      expect(route.request().postDataJSON().data?.linkfy_username).toBeUndefined()
       if (registration.error) {
         return route.fulfill({
           status: 422,
@@ -524,6 +550,7 @@ for (const registration of [
       })
     })
     await page.goto(SITE_URL + '/register')
+    await expect(page.getByLabel('Username untuk alamat halaman')).toHaveCount(0)
     await page.getByLabel('Email', { exact: true }).fill('maya@linkfy.test')
     await page.getByLabel('Kata sandi', { exact: true }).fill('contoh-password')
     await page.getByRole('button', { name: 'Daftar', exact: true }).click()
@@ -538,3 +565,54 @@ for (const registration of [
     await expect(page.getByRole('link', { name: 'Sudah punya akun? Masuk' })).toBeVisible()
   })
 }
+
+test('setelah masuk, akun tanpa halaman memilih username yang unik', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 })
+  await openMemberStudio(page, { withoutPage: true })
+  await expect(page.getByRole('heading', { name: 'Buat halamanmu' })).toBeVisible()
+  const username = page.getByLabel('Username untuk alamat halaman')
+  await page.getByLabel('Nama profil').fill('Maya')
+  await username.fill('MAYA')
+  const domain = page.getByText(new URL(SITE_URL).host + '/', { exact: true })
+  await expect(domain).toBeVisible()
+  const domainBox = await domain.boundingBox()
+  const usernameBox = await username.boundingBox()
+  expect(domainBox.x + domainBox.width).toBeCloseTo(usernameBox.x)
+  expect(domainBox.y).toBeCloseTo(usernameBox.y)
+  await expect(username).toHaveValue('maya')
+  const create = page.getByRole('button', { name: 'Buat halaman' })
+  const status = page.locator('#member-slug-status')
+  await expect(status).toContainText('Username ini sudah dipakai')
+  await expect(status).toHaveCSS('color', 'rgb(157, 40, 59)')
+  await expect(status.locator('svg.lucide-x')).toBeVisible()
+  await expect(create).toBeDisabled()
+  await username.fill('maya-balap')
+  await expect(status).toHaveText('Username tersedia.')
+  await expect(status).toHaveCSS('color', 'rgb(19, 92, 56)')
+  await expect(status.locator('svg.lucide-check')).toBeVisible()
+  await create.click()
+  await expect(status).toContainText('Username ini sudah dipakai')
+  await username.fill('maya-baru')
+  await expect(status).toHaveText('Username tersedia.')
+  await create.click()
+  await expect(page.getByRole('navigation', { name: 'Bagian editor' })).toBeVisible()
+  await page.reload()
+  await expect(page.getByRole('navigation', { name: 'Bagian editor' })).toBeVisible()
+  await expect(username).toHaveCount(0)
+})
+
+test('editor menjelaskan jika cek username belum aktif dan tetap bisa membuat halaman', async ({
+  page,
+}) => {
+  await openMemberStudio(page, { withoutPage: true, slugCheckMissing: true })
+  await page.getByLabel('Nama profil').fill('Maya')
+  await page.getByLabel('Username untuk alamat halaman').fill('maya')
+  const status = page.locator('#member-slug-status')
+  await expect(status).toContainText('Cek otomatis belum aktif')
+  await page.getByRole('button', { name: 'Buat halaman' }).click()
+  await expect(status).toContainText('Username ini sudah dipakai')
+  await page.getByLabel('Username untuk alamat halaman').fill('maya-baru')
+  await expect(status).toContainText('Cek otomatis belum aktif')
+  await page.getByRole('button', { name: 'Buat halaman' }).click()
+  await expect(page.getByRole('navigation', { name: 'Bagian editor' })).toBeVisible()
+})

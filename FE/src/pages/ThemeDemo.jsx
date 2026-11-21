@@ -33,7 +33,7 @@ export function ThemeDemo() {
       <div className="ly-phone" data-theme={theme.id}>
         <div className="ly-phone-top">
           <span className="ly-phone-address">
-            <Link2 size={13} aria-hidden="true" /> /u/ruang-studio
+            <Link2 size={13} aria-hidden="true" /> /ruang-studio
           </span>
         </div>
         <div className="ly-phone-profile">

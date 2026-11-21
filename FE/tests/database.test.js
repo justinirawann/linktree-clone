@@ -190,10 +190,15 @@ describe('migrasi dan hak akses PostgreSQL', () => {
 
     await role('anon')
     await expect(create('andi', 'Andi')).rejects.toMatchObject({ code: '42501' })
+    await expect(scalar("select public.member_slug_taken('andi')")).rejects.toMatchObject({
+      code: '42501',
+    })
     await role('authenticated', other)
     const created = await create('andi', 'Andi')
     expect((await create('alias-lain', 'Andi')).slug).toBe('andi')
     expect(await readPublic('andi')).toBeNull()
+    expect(await scalar("select public.member_slug_taken(' ANDI ')")).toBe(true)
+    expect(await scalar("select public.member_slug_taken('alias-lain')")).toBe(false)
     await expect(save(created.revision, [], true)).rejects.toMatchObject({ code: '23514' })
     await expect(
       save(created.revision, [{ ...active, url: 'javascript:alert(1)' }], true),
@@ -206,7 +211,11 @@ describe('migrasi dan hak akses PostgreSQL', () => {
 
     await role('authenticated', owner)
     expect(await scalar("select count(*)::int from public.member_pages where slug='andi'")).toBe(0)
-    await expect(create('andi', 'Owner')).rejects.toMatchObject({ code: '23505' })
+    await expect(create(' ANDI ', 'Owner')).rejects.toMatchObject({ code: '23505' })
+    await expect(create(' Dashboard ', 'Owner')).rejects.toMatchObject({
+      code: '23514',
+      message: 'reserved_member_slug',
+    })
     await expect(save(published.revision, [active], false)).rejects.toMatchObject({ code: 'PT409' })
     await expect(
       db.exec("update public.member_pages set published=false where slug='andi'"),

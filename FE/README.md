@@ -33,7 +33,7 @@ Supabase Auth mengelola sesi SPA di `sessionStorage` per tab. Guard memeriksa al
 | `/register`             | Pendaftaran Linkfy lewat email                   |
 | `/dashboard`            | Membuat dan mengelola halaman pribadi            |
 | `/dashboard/analytics`  | Statistik 7 atau 30 hari untuk halaman pengguna  |
-| `/u/:slug`              | Halaman publik milik pengguna                    |
+| `/:slug`                | Halaman publik milik pengguna                    |
 | `/admin/login`          | Login atau permintaan email pemulihan            |
 | `/admin/reset-password` | Form kata sandi setelah membuka email pemulihan  |
 | `/admin/dashboard`      | Profil, sosial, logo, dan CRUD/reorder tautan    |

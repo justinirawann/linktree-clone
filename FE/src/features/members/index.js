@@ -1,6 +1,6 @@
 import { rpc } from '../../shared/lib/transport'
 import { getClient, unwrap } from '../../shared/lib/supabaseClient'
-import { canonicalUrl } from '../../shared/lib/env'
+import { memberPagePath } from '../../shared/lib/routes'
 import { InputError } from '../../shared/lib/rules'
 import { memberAvatars } from './avatars'
 import { resolveMemberTheme, resolveLinkButton, resolveLinkIcon } from './themes'
@@ -10,9 +10,8 @@ export { MemberLinks } from './components/MemberLinks'
 export { MemberAppearance } from './components/MemberAppearance'
 export { memberLinkUrl } from './linkUrl'
 
-export const memberPagePath = (slug) => '/u/' + encodeURIComponent(slug)
-export const memberPageUrl = (slug) =>
-  new URL(memberPagePath(slug), canonicalUrl || window.location.origin).href
+export { memberPagePath }
+export const memberPageUrl = (slug) => new URL(memberPagePath(slug), window.location.origin).href
 
 function appearanceParams(page) {
   // Rows from before migration 019 still use the existing seven-argument RPC.
@@ -28,6 +27,7 @@ export const members = {
   read: ({ signal }) =>
     unwrap(getClient().from('member_pages').select().abortSignal(signal).maybeSingle()),
   readPublic: (slug, signal) => rpc('get_member_page', { page_slug: slug }, signal),
+  slugTaken: (slug, signal) => rpc('member_slug_taken', { chosen_slug: slug }, signal),
   create: (slug, name) => rpc('create_member_page', { chosen_slug: slug, chosen_name: name }),
   async save(page, { image, previousAvatarPath } = {}) {
     const path = image

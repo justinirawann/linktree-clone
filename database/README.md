@@ -32,7 +32,11 @@ Folder `migrations/` adalah sumber schema Supabase. Terapkan setiap file **sekal
 
 Jalankan migrasi 017 pada project yang sudah melalui 001–016. Di Authentication → Sign In / Providers, aktifkan **Allow new users to sign up** dan gunakan **Confirm Email** pada provider Email. Atur Site URL ke origin aplikasi, dan tambahkan `http://localhost:5173/admin/login` pada Redirect URLs untuk pengujian lokal atau alamat production dengan path yang sama. Email konfirmasi untuk pendaftaran publik perlu SMTP yang mendukung alamat pengguna umum.
 
-Pengguna baru membuat halaman dari `/dashboard` setelah masuk. Halaman publik mereka memakai `/u/nama` dan muncul setelah pengguna menyimpannya dengan publikasi aktif. Tabel `private.site_admins` khusus untuk owner Core Consign.
+Halaman publik memakai `/nama` dan tampil setelah publikasi diaktifkan. Migrasi 024 mencadangkan nama rute bawaan. Alamat lama `/u/nama` mengarah ke alamat baru, dan profil lama yang namanya bertabrakan dengan rute bawaan tetap tersedia melalui `/u/nama`. Tabel `private.site_admins` khusus untuk owner Core Consign.
+
+Pengguna memilih username di `/dashboard` setelah masuk jika akunnya belum memiliki halaman. Migrasi 026 menambahkan pengecekan otomatis melalui RPC untuk pengguna yang sudah masuk. Nama ini disimpan ketika draf halaman dibuat. Database memastikan setiap username hanya bisa dipakai oleh satu akun.
+
+Jika cek otomatis mengembalikan `PGRST202` untuk `member_slug_taken`, jalankan seluruh isi [migrasi 026](migrations/026_member_slug_availability.sql) melalui SQL Editor pada proyek Supabase yang sama dengan `VITE_SUPABASE_URL`. Migrasi ini memuat ulang cache skema dan aman dijalankan ulang.
 
 Migrasi 018 menambah bucket privat `member-avatars`. Pemilik dapat mengunggah WebP hingga 5 MB di folder slug miliknya. Pengunjung hanya bisa memuat foto yang sedang dipakai halaman terpublikasi.
 

@@ -13,6 +13,55 @@
 .member-shell > .member-create {
   max-width: 560px;
 }
+.member-address-input {
+  display: flex;
+}
+.member-address-input > span {
+  display: flex;
+  flex: none;
+  align-items: center;
+  max-width: 62%;
+  padding: 8px 10px;
+  border: 1px solid #bdb5c7;
+  border-right: 0;
+  border-radius: 11px 0 0 11px;
+  background: var(--editor-tint);
+  color: var(--editor-muted);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+.editor-surface .field .member-address-input > input {
+  flex: 1;
+  min-width: 0;
+  border-radius: 0 11px 11px 0;
+}
+.member-slug-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--editor-muted);
+  font-size: 0.875rem;
+}
+.member-slug-status[data-tone] {
+  justify-self: start;
+  padding: 6px 10px;
+  border: 1px solid;
+  border-radius: 9px;
+  font-weight: 700;
+}
+.member-slug-status[data-tone='available'] {
+  color: #135c38;
+  border-color: #b7dfc8;
+  background: #edf9f0;
+}
+.member-slug-status[data-tone='unavailable'] {
+  color: #9d283b;
+  border-color: #efc4ca;
+  background: #fff0f2;
+}
+.member-slug-status svg {
+  flex: none;
+}
 .member-hero {
   position: relative;
   isolation: isolate;
