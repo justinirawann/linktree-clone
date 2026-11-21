@@ -26,6 +26,7 @@ Folder `migrations/` adalah sumber schema Supabase. Terapkan setiap file **sekal
 | 020 | Gaya dan bentuk wadah ikon per tautan Linkfy |
 | 021 | Gaya dan bentuk ikon bersama untuk semua tautan dalam satu halaman |
 | 022 | Izinkan ikon TikTok pada tautan owner dan halaman Linkfy |
+| 023 | Catat statistik harian dan batasi laporan ke pemilik halaman |
 
 ## Pendaftaran pengguna Linkfy
 
@@ -38,6 +39,8 @@ Migrasi 018 menambah bucket privat `member-avatars`. Pemilik dapat mengunggah We
 Setelah migrasi 018, jalankan seluruh isi `019_member_appearance.sql` sekali di SQL Editor untuk mengaktifkan penyimpanan tema dan gaya per tautan. Preset halaman yang sudah ada tetap menjadi tampilan awal. Studio dan halaman publik membaca pengaturan yang sama.
 
 Setelah migrasi 021, jalankan `022_tiktok_link_icon.sql` agar Studio bisa menyimpan tautan dengan ikon TikTok. Pilihan ikon Instagram pada tautan lama otomatis menggunakan SVG baru di frontend.
+
+Setelah migrasi 022, jalankan `023_page_analytics.sql` untuk mengaktifkan Statistik di Studio. Laporan memakai hari WIB dan menjumlahkan kunjungan serta klik, termasuk kunjungan dari alamat dengan penanda QR. Data mulai tercatat sejak fitur aktif. Database menyimpan hitungan harian per halaman, tautan, dan sumber.
 
 RLS, policy baca, dan grants dibuat bersama tabel terkait. Perubahan melalui browser hanya diizinkan melalui RPC owner. Isi `private.site_admins` dikelola dari SQL Editor. Tambahkan perubahan schema berikutnya sebagai file bernomor baru.
 

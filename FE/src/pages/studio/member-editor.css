@@ -2,6 +2,7 @@
 
 .member-studio .studio-head {
   justify-content: space-between;
+  flex-wrap: wrap;
   padding-inline: max(16px, calc((100% - 1160px) / 2));
 }
 .member-shell {
@@ -114,7 +115,18 @@
 .member-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(250px, 0.56fr);
-  gap: 24px;
+  grid-template-rows: max-content auto;
+  grid-template-areas:
+    'shortcuts preview'
+    'editor preview';
+  gap: 18px 24px;
+}
+.member-editor {
+  grid-area: editor;
+  align-content: start;
+}
+.member-preview {
+  grid-area: preview;
 }
 .member-editor,
 .member-form > fieldset,
@@ -124,6 +136,8 @@
   gap: 18px;
 }
 .member-shortcuts {
+  grid-area: shortcuts;
+  align-self: start;
   position: sticky;
   top: 6px;
   z-index: 2;
@@ -155,7 +169,7 @@
   background: #e7e1ed;
 }
 .member-shortcuts a[aria-current] {
-  background: var(--editor-ink);
+  background: var(--ly-ink);
   color: white;
 }
 .member-shortcuts a[aria-current] svg {
@@ -164,7 +178,8 @@
 .member-shortcuts .preview-shortcut {
   display: none;
 }
-.member-section {
+.member-section,
+.member-preview {
   scroll-margin-top: 76px;
 }
 .member-editor .field :is(input, textarea, select) {
@@ -285,6 +300,10 @@
 @media (max-width: 720px) {
   .member-layout {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'shortcuts'
+      'editor'
+      'preview';
   }
   .member-hero {
     padding: 23px 18px;

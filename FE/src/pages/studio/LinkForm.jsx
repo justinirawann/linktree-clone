@@ -74,7 +74,7 @@ export function LinkForm({ editor, onCancel }) {
         <div className="form-pair">
           <Field label="Ikon">
             {(p) => (
-              <select {...p} {...connect('icon_key')}>
+              <select className="dropdown" {...p} {...connect('icon_key')}>
                 {Object.entries(ICON_LABELS).map(([icon, label]) => (
                   <option key={icon} value={icon}>
                     {label}
@@ -85,7 +85,7 @@ export function LinkForm({ editor, onCancel }) {
           </Field>
           <Field label="Gaya kartu">
             {(p) => (
-              <select {...p} {...connect('layout')}>
+              <select className="dropdown" {...p} {...connect('layout')}>
                 <option value="classic">Classic</option>
                 <option value="featured">Featured</option>
               </select>

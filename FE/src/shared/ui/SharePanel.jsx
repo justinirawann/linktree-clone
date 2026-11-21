@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Check, Copy, Download, Share2 } from 'lucide-react'
 import { publicPageUrl } from '../lib/env'
 import { createProfileQr } from '../lib/profileQr'
+import { qrPageUrl } from '../lib/routes'
 import { Button } from './Controls'
 import './share-panel.css'
 
@@ -26,7 +27,8 @@ export default function SharePanel({
   const qr = useQuery({
     queryKey: ['qr', url, logoSrc, qrVariant, qrBackground],
     enabled: Boolean(url) && !isLogoLoading,
-    queryFn: () => createProfileQr(url, logoSrc, { variant: qrVariant, background: qrBackground }),
+    queryFn: () =>
+      createProfileQr(qrPageUrl(url), logoSrc, { variant: qrVariant, background: qrBackground }),
   })
   const qrCode = isLogoLoading ? undefined : qr.data
   const suffix =
@@ -90,7 +92,11 @@ export default function SharePanel({
         </div>
         <label className="share-qr-background">
           Latar PNG
-          <select value={qrBackground} onChange={(event) => setQrBackground(event.target.value)}>
+          <select
+            className="dropdown"
+            value={qrBackground}
+            onChange={(event) => setQrBackground(event.target.value)}
+          >
             <option value="solid">Solid</option>
             <option value="transparent">Transparan</option>
           </select>

@@ -329,4 +329,64 @@ describe('migrasi dan hak akses PostgreSQL', () => {
     expect(published.link_styles).toEqual({ [links[0].id]: iconStyle })
     await expect(save({}, {}, saved.revision)).rejects.toMatchObject({ code: '42501' })
   })
+
+  it('statistik hanya mencatat halaman publik dan hanya terbaca pemiliknya', async () => {
+    const user = '00000000-0000-4000-8000-000000000005'
+    const link = {
+      id: '20000000-0000-4000-8000-000000000001',
+      title: 'WhatsApp',
+      url: 'https://wa.me/62812345678',
+      is_active: true,
+      icon_key: 'whatsapp',
+      icon_color: '#ffffff',
+    }
+    const inactive = { ...link, id: '20000000-0000-4000-8000-000000000002', is_active: false }
+    const record = (slug, id = null, source = 'other') =>
+      db.query('select public.record_page_analytics($1,$2,$3)', [slug, id, source])
+    const read = (days = 7, store = false) =>
+      scalar('select public.read_page_analytics($1,$2)', [days, store])
+
+    await db.exec('reset role')
+    await db.query('insert into auth.users values ($1)', [user])
+    await role('authenticated', user)
+    await scalar("select public.create_member_page('ukuran','Ukuran')")
+    await role('anon')
+    await record('ukuran')
+    await expect(read()).rejects.toMatchObject({ code: '42501' })
+    await expect(db.exec('select * from private.page_analytics_daily')).rejects.toMatchObject({
+      code: '42501',
+    })
+    await role('authenticated', user)
+    expect((await read()).days.at(-1)).toMatchObject({ views: 0, clicks: 0, qrViews: 0 })
+    await db.query("select public.save_member_page(1,'Ukuran','','light',$1,true)", [
+      JSON.stringify([link, inactive]),
+    ])
+    await role('anon')
+    await record('ukuran', null, 'qr')
+    await record('ukuran')
+    await record('ukuran', link.id, 'qr')
+    await record('ukuran', link.id)
+    await record('ukuran', inactive.id)
+    await record('ukuran', null, 'arbitrary')
+    await role('authenticated', user)
+    const report = await read(30)
+    expect(report.days).toHaveLength(30)
+    expect(report.days.at(-1)).toMatchObject({ views: 2, clicks: 2, qrViews: 1 })
+    expect(report.links).toEqual([{ id: link.id, title: link.title, clicks: 2 }])
+    await expect(read(90)).rejects.toMatchObject({ code: '23514' })
+    await expect(read(7, true)).rejects.toMatchObject({ code: '42501' })
+    await role('authenticated', other)
+    expect((await read()).days.at(-1)).toMatchObject({ views: 0, clicks: 0, qrViews: 0 })
+
+    await role('authenticated', owner)
+    const store = await scalar('select public.get_editor_page()')
+    await db.query('select public.set_publication($1,true)', [store.profile.revision])
+    await role('anon')
+    await record(null)
+    await record(null, store.links.find((item) => item.is_active).id)
+    await role('authenticated', owner)
+    const storeReport = await read(7, true)
+    expect(storeReport.days.at(-1)).toMatchObject({ views: 1, clicks: 1, qrViews: 0 })
+    expect(storeReport.links).toHaveLength(1)
+  })
 })

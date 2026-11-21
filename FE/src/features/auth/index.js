@@ -48,6 +48,7 @@ export function useSession() {
         cache.removeQueries({ queryKey: ['owner'] })
         cache.removeQueries({ queryKey: ['asset'] })
         cache.removeQueries({ queryKey: ['member-editor'] })
+        cache.removeQueries({ queryKey: ['page-analytics'] })
       }
       previous = id
       setSession(next)

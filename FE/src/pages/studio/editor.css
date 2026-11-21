@@ -84,7 +84,7 @@
 .editor-surface .field label {
   font-weight: 700;
 }
-.editor-surface .field :is(input:not([type='color'], [type='range']), select, textarea),
+.editor-surface .field :is(input:not([type='color'], [type='range']), textarea),
 .editor-surface .color-picker,
 .editor-surface .share-panel input {
   color: var(--editor-ink);
@@ -92,18 +92,16 @@
   border-radius: 11px;
   background-color: #fdfcfe;
 }
-.editor-surface
-  .field
-  :is(input:not([type='color'], [type='range']), select, textarea):enabled:hover,
+.editor-surface .field :is(input:not([type='color'], [type='range']), textarea):enabled:hover,
 .editor-surface .color-picker:hover {
   border-color: #9586a9;
 }
-.editor-surface .field :is(input, select, textarea):focus-visible,
+.editor-surface .field :is(input, textarea):focus-visible,
 .editor-surface .color-picker:focus-within {
   outline: 2px solid var(--editor-focus);
   outline-offset: 2px;
 }
-.editor-surface .field :is(input, select, textarea)[aria-invalid='true'] {
+.editor-surface .field :is(input, textarea)[aria-invalid='true'] {
   border-color: var(--ly-danger);
   background-color: #fff6f7;
 }

@@ -6,7 +6,8 @@
   display: grid;
   place-items: center;
   align-content: center;
-  padding: 44px 14px 73px;
+  row-gap: 30px;
+  padding: 56px 14px 20px;
   border-radius: 32px;
   overflow: hidden;
   color: #f7efff;
@@ -81,12 +82,6 @@
 
 .ly-phone {
   transform: rotateY(-14deg) rotateX(6deg) rotateZ(-4deg);
-  --demo-paper: #e3d8fb;
-  --demo-ink: #2e1d46;
-  --demo-panel: #f8f3ff;
-  --demo-border: #c2a9e6;
-  --demo-avatar: #2e1d46;
-  --demo-avatar-ink: #eddfff;
   width: min(100%, 246px);
   padding: 13px 15px 14px;
   border: 6px solid #1b1527;
@@ -105,7 +100,40 @@
     color 0.2s ease;
 }
 
-.ly-phone[data-theme='lime'] {
+.ly-demo [data-theme='lavender'] {
+  --demo-paper: #e3d8fb;
+  --demo-ink: #2e1d46;
+  --demo-panel: #f8f3ff;
+  --demo-border: #c2a9e6;
+  --demo-avatar: #2e1d46;
+  --demo-avatar-ink: #eddfff;
+}
+
+.ly-demo [data-theme='rose'] {
+  --demo-paper: #f8cedd;
+  --demo-ink: #50233c;
+  --demo-panel: #fff3f8;
+  --demo-border: #d99cb5;
+  --demo-avatar: #85395d;
+}
+
+.ly-demo [data-theme='peach'] {
+  --demo-paper: #ffd5b9;
+  --demo-ink: #552d20;
+  --demo-panel: #fff4e9;
+  --demo-border: #dda585;
+  --demo-avatar: #8a4328;
+}
+
+.ly-demo [data-theme='honey'] {
+  --demo-paper: #ffe38a;
+  --demo-ink: #49330f;
+  --demo-panel: #fff6ce;
+  --demo-border: #c5a34d;
+  --demo-avatar: #704c11;
+}
+
+.ly-demo [data-theme='lime'] {
   --demo-paper: #e8f998;
   --demo-ink: #25311a;
   --demo-panel: #f9ffdf;
@@ -114,7 +142,40 @@
   --demo-avatar-ink: #edfbbd;
 }
 
-.ly-phone[data-theme='dark'] {
+.ly-demo [data-theme='mint'] {
+  --demo-paper: #b9ecd7;
+  --demo-ink: #173c34;
+  --demo-panel: #effcf6;
+  --demo-border: #7dbfa7;
+  --demo-avatar: #226253;
+}
+
+.ly-demo [data-theme='sky'] {
+  --demo-paper: #bfe1ff;
+  --demo-ink: #193757;
+  --demo-panel: #f1f8ff;
+  --demo-border: #85b1d9;
+  --demo-avatar: #2e5a88;
+}
+
+.ly-demo [data-theme='sand'] {
+  --demo-paper: #eee3cf;
+  --demo-ink: #42382e;
+  --demo-panel: #fffaf1;
+  --demo-border: #c5b296;
+  --demo-avatar: #6c523a;
+}
+
+.ly-demo [data-theme='navy'] {
+  --demo-paper: #162f55;
+  --demo-ink: #edf5ff;
+  --demo-panel: #25436b;
+  --demo-border: #617ea5;
+  --demo-avatar: #c1dbff;
+  --demo-avatar-ink: #162f55;
+}
+
+.ly-demo [data-theme='dark'] {
   --demo-paper: #262238;
   --demo-ink: #f4eefa;
   --demo-panel: #372f4b;
@@ -161,7 +222,7 @@
   height: 62px;
   border-radius: 19px;
   background: var(--demo-avatar);
-  color: var(--demo-avatar-ink);
+  color: var(--demo-avatar-ink, var(--demo-paper));
   transform: rotate(-9deg);
 }
 
@@ -217,29 +278,44 @@
 }
 
 .ly-theme-picker {
-  position: absolute;
-  left: 25px;
-  bottom: 14px;
-  display: flex;
-  gap: 1px;
-  margin: 0;
+  container-type: inline-size;
+  inline-size: 100%;
+  min-inline-size: 0;
+  text-align: center;
 }
 
 .ly-theme-picker legend {
-  float: left;
-  margin-right: 6px;
-  padding: 0 5px;
+  margin-inline: auto;
   font-size: 0.875rem;
   font-weight: 700;
-  line-height: 43px;
+}
+
+.ly-theme-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-inline-size: 220px;
+  margin-inline: auto;
+}
+
+@container (min-width: 440px) {
+  .ly-theme-swatches {
+    max-inline-size: 440px;
+  }
+}
+
+.ly-theme-name {
+  color: #e4d5fa;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .ly-theme-option {
   position: relative;
   display: grid;
   place-items: center;
-  width: 43px;
-  height: 43px;
+  width: 44px;
+  height: 44px;
   cursor: pointer;
 }
 
@@ -258,7 +334,7 @@
   height: 27px;
   border: 1px solid #ebe1fd90;
   border-radius: 50%;
-  background: var(--swatch);
+  background: var(--demo-paper);
 }
 
 .ly-theme-option input:checked ~ i {
@@ -268,6 +344,24 @@
 
 .ly-theme-option input:focus-visible ~ i {
   box-shadow: 0 0 0 7px #a98ddb;
+}
+
+@media (hover: hover) {
+  .ly-theme-option:hover i {
+    border-color: #f6ebff;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ly-theme-option i {
+      transition:
+        scale var(--front-hover-time) ease-out,
+        border-color var(--front-hover-time) ease-out;
+    }
+
+    .ly-theme-option:hover i {
+      scale: 1.12;
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

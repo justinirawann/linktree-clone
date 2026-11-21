@@ -2,9 +2,6 @@
   display: none;
 }
 .member-preview {
-  scroll-margin-top: 72px;
-}
-.member-preview {
   display: flex;
   flex-direction: column;
 }

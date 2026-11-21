@@ -32,12 +32,14 @@ Supabase Auth mengelola sesi SPA di `sessionStorage` per tab. Guard memeriksa al
 | `/core-consign`         | Direktori toko, share, salin URL, QR PNG         |
 | `/register`             | Pendaftaran Linkfy lewat email                   |
 | `/dashboard`            | Membuat dan mengelola halaman pribadi            |
+| `/dashboard/analytics`  | Statistik 7 atau 30 hari untuk halaman pengguna  |
 | `/u/:slug`              | Halaman publik milik pengguna                    |
 | `/admin/login`          | Login atau permintaan email pemulihan            |
 | `/admin/reset-password` | Form kata sandi setelah membuka email pemulihan  |
 | `/admin/dashboard`      | Profil, sosial, logo, dan CRUD/reorder tautan    |
 | `/admin/appearance`     | Tema, font, warna, gambar latar, dan gaya tombol |
 | `/admin/settings`       | Publikasi, berbagi, QR, dan logout               |
+| `/admin/analytics`      | Statistik 7 atau 30 hari untuk Core Consign      |
 
 Tiga halaman studio memiliki padanan development di `/studio/` ketika Supabase belum dikonfigurasi. Preview merender komponen yang sama dengan halaman pengunjung. Tombol **Simpan Perubahan** menyimpan profil, formulir tautan, atau tampilan. Aksi cepat aktif/nonaktif dan perubahan urutan langsung disimpan. Konflik menahan draft dan menyediakan aksi memuat ulang versi tersimpan.
 

@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   ArrowUpRight,
   Check,
+  ChartNoAxesColumnIncreasing,
   Globe,
   Link2,
   LogOut,
@@ -102,9 +103,61 @@ function CreatePage({ userId }) {
   )
 }
 
+function useActiveSection(navigationRef) {
+  const [activeSection, setActiveSection] = useState('profil')
+
+  useEffect(() => {
+    const navigation = navigationRef.current
+    const sections = Array.from(navigation.querySelectorAll('a'), (link) => ({
+      link,
+      section: document.getElementById(link.hash.slice(1)),
+    }))
+    const scrollRoot = document.documentElement
+    let frame
+
+    function update() {
+      frame = undefined
+      const { scrollHeight, clientHeight } = scrollRoot
+      const atBottom =
+        scrollHeight > clientHeight && window.scrollY + clientHeight >= scrollHeight - 1
+      const cutoff = atBottom ? clientHeight : navigation.getBoundingClientRect().bottom + 18
+      let current = 'profil'
+
+      for (const { link, section } of sections) {
+        if (link.offsetWidth && section.getBoundingClientRect().top <= cutoff) {
+          current = section.id
+        }
+      }
+      setActiveSection(current)
+    }
+
+    function scheduleUpdate() {
+      frame ??= window.requestAnimationFrame(update)
+    }
+
+    const observer = new ResizeObserver(scheduleUpdate)
+    observer.observe(navigation)
+    sections.forEach(({ section }) => observer.observe(section))
+    window.addEventListener('scroll', scheduleUpdate, { passive: true })
+    window.addEventListener('resize', scheduleUpdate)
+    scheduleUpdate()
+
+    return () => {
+      if (frame !== undefined) window.cancelAnimationFrame(frame)
+      observer.disconnect()
+      window.removeEventListener('scroll', scheduleUpdate)
+      window.removeEventListener('resize', scheduleUpdate)
+    }
+  }, [navigationRef])
+
+  return activeSection
+}
+
 function EditPage({ page, userId }) {
   const editor = useEditor(userId, EDITOR_KEY)
   const location = useLocation()
+  const navigationRef = useRef(null)
+  const activeSection = useActiveSection(navigationRef)
   useEffect(() => {
     const section = document.getElementById(location.hash.slice(1))
     if (section) {
@@ -170,35 +223,29 @@ function EditPage({ page, userId }) {
 
   return (
     <div className="member-layout">
+      <nav ref={navigationRef} className="member-shortcuts" aria-label="Bagian editor">
+        <Link to="#profil" aria-current={activeSection === 'profil' ? 'location' : undefined}>
+          <UserRound size={16} />
+          Profil
+        </Link>
+        <Link to="#tampilan" aria-current={activeSection === 'tampilan' ? 'location' : undefined}>
+          <Palette size={16} />
+          Tampilan
+        </Link>
+        <Link to="#tautan" aria-current={activeSection === 'tautan' ? 'location' : undefined}>
+          <Link2 size={16} />
+          Tautan
+        </Link>
+        <Link
+          to="#pratinjau"
+          className="preview-shortcut"
+          aria-current={activeSection === 'pratinjau' ? 'location' : undefined}
+        >
+          <Smartphone size={16} />
+          Pratinjau
+        </Link>
+      </nav>
       <div className="member-editor editor-surface">
-        <nav className="member-shortcuts" aria-label="Bagian editor">
-          <Link
-            to="#profil"
-            aria-current={['', '#profil'].includes(location.hash) ? 'location' : undefined}
-          >
-            <UserRound size={16} />
-            Profil
-          </Link>
-          <Link
-            to="#tampilan"
-            aria-current={location.hash === '#tampilan' ? 'location' : undefined}
-          >
-            <Palette size={16} />
-            Tampilan
-          </Link>
-          <Link to="#tautan" aria-current={location.hash === '#tautan' ? 'location' : undefined}>
-            <Link2 size={16} />
-            Tautan
-          </Link>
-          <Link
-            to="#pratinjau"
-            className="preview-shortcut"
-            aria-current={location.hash === '#pratinjau' ? 'location' : undefined}
-          >
-            <Smartphone size={16} />
-            Pratinjau
-          </Link>
-        </nav>
         <form className="member-form" onSubmit={submit}>
           <fieldset disabled={editor.busy}>
             <section className="editor-panel member-section" id="profil" tabIndex={-1}>
@@ -378,10 +425,17 @@ export default function MemberStudioPage() {
     <main className="member-studio linkfy-ui">
       <header className="studio-head">
         <LinkfyLogo />
-        <Button disabled={logout.isPending} onClick={() => logout.mutate()}>
-          <LogOut size={16} />
-          Keluar
-        </Button>
+        <div className="button-row">
+          {page.data && (
+            <Link className="btn secondary" to="/dashboard/analytics">
+              <ChartNoAxesColumnIncreasing size={16} aria-hidden="true" /> Statistik
+            </Link>
+          )}
+          <Button disabled={logout.isPending} onClick={() => logout.mutate()}>
+            <LogOut size={16} />
+            Keluar
+          </Button>
+        </div>
       </header>
       <div className="member-shell">
         <div className="member-hero">

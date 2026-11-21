@@ -4,9 +4,16 @@ import { ChannelIcon } from '../shared/ui/ChannelIcon'
 import './theme-demo.css'
 
 const THEMES = [
-  { id: 'lavender', label: 'Lavender', swatch: '#dcd1ff' },
-  { id: 'lime', label: 'Lime', swatch: '#e9fa85' },
-  { id: 'dark', label: 'Gelap', swatch: '#242137' },
+  { id: 'lavender', label: 'Lavender' },
+  { id: 'rose', label: 'Mawar' },
+  { id: 'peach', label: 'Peach' },
+  { id: 'honey', label: 'Madu' },
+  { id: 'lime', label: 'Lime' },
+  { id: 'mint', label: 'Mint' },
+  { id: 'sky', label: 'Biru langit' },
+  { id: 'sand', label: 'Pasir' },
+  { id: 'navy', label: 'Biru malam', dark: true },
+  { id: 'dark', label: 'Gelap', dark: true },
 ]
 const DEMO_LINKS = [
   { label: 'Portofolio', icon: <Briefcase size={17} aria-hidden="true" /> },
@@ -15,7 +22,7 @@ const DEMO_LINKS = [
 ]
 
 export function ThemeDemo() {
-  const [theme, setTheme] = useState('lavender')
+  const [theme, setTheme] = useState(THEMES[0])
 
   return (
     <section className="ly-demo" id="contoh" aria-label="Demo tema Linkfy">
@@ -23,7 +30,7 @@ export function ThemeDemo() {
       <div className="ly-stage-label">
         <span /> Demo halaman
       </div>
-      <div className="ly-phone" data-theme={theme}>
+      <div className="ly-phone" data-theme={theme.id}>
         <div className="ly-phone-top">
           <span className="ly-phone-address">
             <Link2 size={13} aria-hidden="true" /> /u/ruang-studio
@@ -48,7 +55,7 @@ export function ThemeDemo() {
         </ul>
         <div className="ly-phone-footer">
           <img
-            src={theme === 'dark' ? '/linkfy-ly-white.svg' : '/linkfy-ly-black.svg'}
+            src={theme.dark ? '/linkfy-ly-white.svg' : '/linkfy-ly-black.svg'}
             width="28"
             height="28"
             alt="Linkfy"
@@ -57,19 +64,27 @@ export function ThemeDemo() {
       </div>
       <fieldset className="ly-theme-picker">
         <legend>Coba tema</legend>
-        {THEMES.map(({ id, label, swatch }) => (
-          <label key={id} title={label} className="ly-theme-option" style={{ '--swatch': swatch }}>
-            <input
-              type="radio"
-              name="demo-theme"
-              value={id}
-              checked={theme === id}
-              onChange={() => setTheme(id)}
-            />
-            <span className="ly-sr-only">{label}</span>
-            <i aria-hidden="true" />
-          </label>
-        ))}
+        <div className="ly-theme-swatches">
+          {THEMES.map((option) => (
+            <label
+              key={option.id}
+              title={option.label}
+              className="ly-theme-option"
+              data-theme={option.id}
+            >
+              <input
+                type="radio"
+                name="demo-theme"
+                value={option.id}
+                checked={theme.id === option.id}
+                onChange={() => setTheme(option)}
+              />
+              <span className="ly-sr-only">{option.label}</span>
+              <i aria-hidden="true" />
+            </label>
+          ))}
+        </div>
+        <p className="ly-theme-name">{theme.label}</p>
       </fieldset>
     </section>
   )

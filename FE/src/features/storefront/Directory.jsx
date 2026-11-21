@@ -59,7 +59,7 @@ function Cover({ name }) {
     </div>
   )
 }
-function ChannelCard({ link, interactive, onPreview }) {
+function ChannelCard({ link, interactive, onPreview, onLinkOpen }) {
   const button = link.button
   const cardProps = {
     className: 'channel-card ' + (link.layout === 'featured' ? 'featured' : ''),
@@ -93,7 +93,16 @@ function ChannelCard({ link, interactive, onPreview }) {
     </>
   )
   const card = interactive ? (
-    <a {...cardProps} href={link.url} target="_blank" rel="noopener noreferrer">
+    <a
+      {...cardProps}
+      href={link.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => onLinkOpen?.(link.id)}
+      onAuxClick={(event) => {
+        if (event.button === 1) onLinkOpen?.(link.id)
+      }}
+    >
       {body}
     </a>
   ) : (
@@ -121,6 +130,7 @@ export default function Directory({
   member = false,
   shareUrl,
   isAvatarLoading = false,
+  onLinkOpen,
 }) {
   const Content = preview ? 'div' : 'main'
   const [sharing, setSharing] = useState(false)
@@ -226,6 +236,7 @@ export default function Directory({
                 <ChannelCard
                   link={link}
                   interactive={!preview && !page.showcase}
+                  onLinkOpen={onLinkOpen}
                   onPreview={
                     !page.showcase && (member || !preview) && validUrl(link.url)
                       ? setPreviewLink
@@ -254,7 +265,7 @@ export default function Directory({
       {previewLink && (
         <Dialog title="Pratinjau tautan" onClose={() => setPreviewLink(null)}>
           <Suspense fallback={<p role="status">Memuat pratinjau…</p>}>
-            <LinkPreview link={previewLink} />
+            <LinkPreview link={previewLink} onLinkOpen={preview ? undefined : onLinkOpen} />
           </Suspense>
         </Dialog>
       )}

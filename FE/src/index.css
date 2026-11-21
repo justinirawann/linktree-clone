@@ -5,6 +5,7 @@
 @import '@fontsource/barlow-condensed/latin-800-italic.css';
 @import 'tailwindcss';
 @import './shared/styles/linkfy.css';
+@import './shared/styles/dropdown.css';
 .upload-progress {
   display: flex;
   align-items: center;
@@ -826,7 +827,7 @@ button:disabled {
   font-weight: 700;
   font-size: 0.875rem;
 }
-.field :where(input:not([type='color']):not([type='range']), textarea, select),
+.field :where(input:not([type='color']):not([type='range']), textarea),
 .share-panel input {
   width: 100%;
   border: 1px solid #514d51;

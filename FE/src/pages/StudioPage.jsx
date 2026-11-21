@@ -1,7 +1,16 @@
 import { useState } from 'react'
 import { Link, NavLink, Navigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Link2, Palette, Settings2, Eye, PanelLeft, ExternalLink, Smartphone } from 'lucide-react'
+import {
+  Link2,
+  Palette,
+  Settings2,
+  Eye,
+  PanelLeft,
+  ExternalLink,
+  Smartphone,
+  ChartNoAxesColumnIncreasing,
+} from 'lucide-react'
 import { siteRepository } from '../features/site'
 import { useOwner } from '../features/auth'
 import { Directory } from '../features/storefront'
@@ -70,6 +79,12 @@ function Studio({ section, local, userId }) {
               {title}
             </NavLink>
           ))}
+          {!local && (
+            <Link to="/admin/analytics">
+              <ChartNoAxesColumnIncreasing size={18} aria-hidden="true" />
+              Statistik
+            </Link>
+          )}
         </nav>
         <main className="studio-main">
           <div className="studio-title">

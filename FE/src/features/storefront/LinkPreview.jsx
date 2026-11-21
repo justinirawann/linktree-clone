@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ArrowUpRight, Check, Copy, Globe, Share2 } from 'lucide-react'
 import { readLinkMetadata } from './linkMetadata'
 
-export default function LinkPreview({ link }) {
+export default function LinkPreview({ link, onLinkOpen }) {
   const [copyState, setCopyState] = useState('')
   const [failedImage, setFailedImage] = useState('')
   const query = useQuery({
@@ -48,7 +48,16 @@ export default function LinkPreview({ link }) {
           {query.isPending && <p role="status">Mengambil info dari situs…</p>}
         </div>
       </article>
-      <a className="destination-open" href={link.url} target="_blank" rel="noopener noreferrer">
+      <a
+        className="destination-open"
+        href={link.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => onLinkOpen?.(link.id)}
+        onAuxClick={(event) => {
+          if (event.button === 1) onLinkOpen?.(link.id)
+        }}
+      >
         Buka tautan <ArrowUpRight size={18} />
       </a>
       <div className="destination-share">

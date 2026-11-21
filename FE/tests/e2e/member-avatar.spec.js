@@ -56,6 +56,7 @@ async function openMemberStudio(page, { legacy = false } = {}) {
     ],
   }
   const files = new Map()
+  const activity = []
   await page.route(FIXTURE_URL + '/**', async (route) => {
     const request = route.request()
     const endpoint = new URL(request.url()).pathname
@@ -89,6 +90,29 @@ async function openMemberStudio(page, { legacy = false } = {}) {
       })
     } else if (endpoint.endsWith('/is_site_admin')) {
       await route.fulfill({ json: false })
+    } else if (endpoint.endsWith('/record_page_analytics')) {
+      activity.push(request.postDataJSON())
+      await route.fulfill({ json: null })
+    } else if (endpoint.endsWith('/read_page_analytics')) {
+      const { period_days } = request.postDataJSON()
+      const visits = activity.filter((event) => !event.link_id)
+      const clicks = activity.length - visits.length
+      await route.fulfill({
+        json: {
+          days: Array.from({ length: period_days }, (_, index) => ({
+            day: '2026-11-' + String(index + 1).padStart(2, '0'),
+            views: index === period_days - 1 ? visits.length : 0,
+            clicks: index === period_days - 1 ? clicks : 0,
+            qrViews:
+              index === period_days - 1
+                ? visits.filter((event) => event.visit_source === 'qr').length
+                : 0,
+          })),
+          links: clicks
+            ? [{ id: savedPage.links[0].id, title: savedPage.links[0].title, clicks }]
+            : [],
+        },
+      })
     } else if (endpoint.endsWith('/member_pages')) {
       await route.fulfill({ json: [savedPage] })
     } else if (endpoint.endsWith('/save_member_page')) {
@@ -234,7 +258,7 @@ test('QR dengan foto profil dapat dipindai pada kedua warna dan pilihan latar', 
     expect(pixels.center[1]).toBeLessThan(90)
     expect(pixels.center[3]).toBe(255)
     const decoded = jsQR(imageData, pixels.width, pixels.height)
-    expect(decoded?.data).toBe(SITE_URL + '/u/maya')
+    expect(decoded?.data).toBe(SITE_URL + '/u/maya?ref=qr')
     const finder = decoded.location.topLeftFinderPattern
     const finderOffset = (Math.floor(finder.y) * pixels.width + Math.floor(finder.x)) * 4
     expect([...imageData.slice(finderOffset, finderOffset + 4)]).toEqual([
@@ -257,6 +281,43 @@ test('QR dengan foto profil dapat dipindai pada kedua warna dan pilihan latar', 
     'download',
     'linkfy-qr-putih-transparan.png',
   )
+})
+
+test('dashboard menampilkan kunjungan QR dan klik, lalu mengganti rentang', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 })
+  await openMemberStudio(page)
+  const statistics = page.getByRole('link', { name: 'Statistik', exact: true })
+  await statistics.click()
+  await expect(page.getByText('Belum ada klik yang tercatat.')).toBeVisible()
+
+  const recorded = page.waitForRequest(
+    (request) =>
+      request.url().endsWith('/record_page_analytics') && !request.postDataJSON().link_id,
+  )
+  await page.goto(SITE_URL + '/u/maya?ref=qr')
+  expect((await recorded).postDataJSON()).toMatchObject({ page_slug: 'maya', visit_source: 'qr' })
+  const destination = page.getByRole('link', { name: 'Portofolio' })
+  await destination.evaluate((link) =>
+    link.addEventListener('click', (event) => event.preventDefault(), { once: true }),
+  )
+  const clicked = page.waitForResponse(
+    (response) =>
+      response.url().endsWith('/record_page_analytics') &&
+      Boolean(response.request().postDataJSON().link_id),
+  )
+  await destination.click()
+  await clicked
+
+  await page.goto(SITE_URL + '/dashboard')
+  await statistics.click()
+  await expect(page.getByRole('heading', { name: 'Statistik', exact: true })).toBeVisible()
+  const metrics = page.locator('.analytics-metrics dd')
+  await expect(metrics).toHaveText(['1', '1', '1'])
+  await expect(page.getByRole('list').getByText('Portofolio')).toBeVisible()
+  await page.getByRole('button', { name: '30 hari' }).click()
+  await expect(page).toHaveURL(/hari=30$/)
+  await expect(page.getByLabel('Tanggal aktivitas').locator('option')).toHaveCount(30)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(360)
 })
 
 test('warna, bentuk dan efek dibagikan persis seperti pratinjau', async ({ page }) => {
@@ -397,17 +458,37 @@ test('pintasan editor bisa dipakai di HP tanpa kehilangan draft', async ({ page 
   await openMemberStudio(page)
   await expect(page.getByLabel('Nama profil')).toHaveValue('Maya')
   await page.screenshot({ path: testInfo.outputPath('studio-desktop.png') })
+  const navigation = page.getByRole('navigation', { name: 'Bagian editor' })
+  const appearance = navigation.getByRole('link', { name: 'Tampilan', exact: true })
+  const links = navigation.getByRole('link', { name: 'Tautan', exact: true })
+  const preview = navigation.getByRole('link', { name: 'Pratinjau', exact: true })
+  const scrollToSection = (id) =>
+    page.locator('#' + id).evaluate((section) => section.scrollIntoView())
+  const navbarTop = () => navigation.evaluate((nav) => nav.getBoundingClientRect().top)
+
+  await scrollToSection('tampilan')
+  await expect(appearance).toHaveAttribute('aria-current', 'location')
+  await expect.poll(navbarTop).toBeCloseTo(6, 0)
+  await page.evaluate(() => window.scrollTo(0, 0))
   await page.setViewportSize({ width: 360, height: 800 })
   await page.screenshot({ path: testInfo.outputPath('studio-mobile.png') })
   await page.getByLabel('Bio', { exact: true }).fill('Katalog Maya')
-  const navigation = page.getByRole('navigation', { name: 'Bagian editor' })
-  await navigation.getByRole('link', { name: 'Pratinjau' }).click()
+  await preview.click()
   await expect(
     page.getByRole('region', { name: 'Pratinjau toko' }).getByText('Katalog Maya'),
   ).toBeInViewport()
-  await navigation.getByRole('link', { name: 'Tampilan' }).click()
+  await expect(preview).toHaveAttribute('aria-current', 'location')
+  await expect.poll(navbarTop).toBeCloseTo(6, 0)
+  await appearance.click()
   await expect(page.getByRole('heading', { name: 'Tampilan halaman' })).toBeInViewport()
+  await expect(appearance).toHaveAttribute('aria-current', 'location')
   await page.getByLabel('Warna latar', { exact: true }).fill('#eee0ff')
+  await scrollToSection('tautan')
+  await expect(links).toHaveAttribute('aria-current', 'location')
+  await expect.poll(navbarTop).toBeCloseTo(6, 0)
+  await scrollToSection('tampilan')
+  await expect(appearance).toHaveAttribute('aria-current', 'location')
+  await expect(page).toHaveURL(/#tampilan$/)
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360)
   await navigation.getByRole('link', { name: 'Profil' }).click()
   await expect(page.getByLabel('Bio', { exact: true })).toHaveValue('Katalog Maya')

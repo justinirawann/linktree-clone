@@ -95,6 +95,7 @@ export function MemberLinks({
             <Field label="Ikon">
               {(props) => (
                 <select
+                  className="dropdown"
                   {...props}
                   value={link.icon_key}
                   onChange={(event) => update(index, { icon_key: event.target.value })}

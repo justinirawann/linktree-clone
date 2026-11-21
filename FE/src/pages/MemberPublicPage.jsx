@@ -4,6 +4,7 @@ import { hasSupabase } from '../shared/lib/env'
 import { StatusPage } from '../shared/ui/Controls'
 import { LinkfyLogo } from '../shared/ui/LinkfyLogo'
 import { Directory } from '../features/storefront'
+import { usePageAnalytics } from '../features/analytics'
 import { memberDirectory, memberPageUrl, members, useMemberAvatar } from '../features/members'
 import './members.css'
 
@@ -15,6 +16,7 @@ export default function MemberPublicPage() {
     enabled: hasSupabase,
   })
   const avatar = useMemberAvatar(page.data?.avatar_path)
+  const trackLink = usePageAnalytics(slug, Boolean(page.data))
   const brand = <LinkfyLogo />
   if (hasSupabase && page.isPending)
     return <StatusPage className="linkfy-ui" brand={brand} title="Memuat halaman…" />
@@ -41,6 +43,7 @@ export default function MemberPublicPage() {
         member
         shareUrl={memberPageUrl(slug)}
         isAvatarLoading={Boolean(page.data.avatar_path) && avatar.isPending}
+        onLinkOpen={trackLink}
       />
     </div>
   )

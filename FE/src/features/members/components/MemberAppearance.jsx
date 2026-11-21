@@ -35,6 +35,7 @@ export function ButtonFields({ settings, button, onChange, perLink = false }) {
         <Field key={key} label={label}>
           {(props) => (
             <select
+              className="dropdown"
               {...props}
               value={perLink ? settings[key] || '' : button[key]}
               onChange={(e) => change(key, e.target.value)}
@@ -87,6 +88,7 @@ export function MemberAppearance({ preset, settings = {}, onChange }) {
           <Field label="Tema">
             {(props) => (
               <select
+                className="dropdown"
                 {...props}
                 value={preset}
                 onChange={(e) => {
@@ -140,6 +142,7 @@ export function MemberAppearance({ preset, settings = {}, onChange }) {
             <Field key={key} label={label}>
               {(props) => (
                 <select
+                  className="dropdown"
                   {...props}
                   value={selected}
                   onChange={(e) =>

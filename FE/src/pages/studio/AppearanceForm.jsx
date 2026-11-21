@@ -64,6 +64,7 @@ export function AppearanceForm({ page, editor }) {
         <Field label="Jenis latar">
           {(p) => (
             <select
+              className="dropdown"
               {...p}
               value={t.background_type}
               onChange={(e) => change({ background_type: e.target.value })}
@@ -98,7 +99,12 @@ export function AppearanceForm({ page, editor }) {
         </div>
         <Field label="Font">
           {(p) => (
-            <select {...p} value={t.font} onChange={(e) => change({ font: e.target.value })}>
+            <select
+              className="dropdown"
+              {...p}
+              value={t.font}
+              onChange={(e) => change({ font: e.target.value })}
+            >
               <option value="dm">DM Sans</option>
               <option value="system">System Sans</option>
               <option value="georgia">Georgia</option>

@@ -11,6 +11,7 @@ const LandingPage = lazy(() => import('./pages/LandingPage')),
   PublicPage = lazy(() => import('./pages/PublicPage')),
   RegisterPage = lazy(() => import('./pages/RegisterPage')),
   MemberStudioPage = lazy(() => import('./pages/MemberStudioPage')),
+  AnalyticsPage = lazy(() => import('./pages/AnalyticsPage')),
   MemberPublicPage = lazy(() => import('./pages/MemberPublicPage'))
 function Layout() {
   const location = useLocation()
@@ -28,6 +29,7 @@ function Layout() {
     else if (path === '/admin/login') document.title = 'Masuk • Linkfy'
     else if (path === '/register') document.title = 'Daftar • Linkfy'
     else if (path === '/admin/reset-password') document.title = 'Ubah kata sandi • Linkfy'
+    else if (path.endsWith('/analytics')) document.title = 'Statistik • Linkfy'
     else if (isStore) document.title = 'Core Consign — Komputer & Titip Jual'
     else if (isMemberPage) document.title = 'Halaman Linkfy'
     else document.title = 'Studio • Linkfy'
@@ -61,6 +63,8 @@ const router = createBrowserRouter([
       { path: PUBLIC_PAGE_PATH, element: <PublicPage /> },
       { path: '/register', element: <RegisterPage /> },
       { path: '/dashboard', element: <MemberStudioPage /> },
+      { path: '/dashboard/analytics', element: <AnalyticsPage /> },
+      { path: '/admin/analytics', element: <AnalyticsPage ownerStore /> },
       { path: '/u/:slug', element: <MemberPublicPage /> },
       { path: '/admin/login', element: <AuthPage /> },
       { path: '/admin/reset-password', element: <AuthPage reset /> },

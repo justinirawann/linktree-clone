@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { siteRepository } from '../features/site'
 import { Directory } from '../features/storefront'
+import { usePageAnalytics } from '../features/analytics'
 import { StatusPage } from '../shared/ui/Controls'
 import { localStudio, hasSupabase } from '../shared/lib/env'
 export default function PublicPage() {
@@ -10,6 +11,7 @@ export default function PublicPage() {
     queryFn: siteRepository.readPublic,
     enabled: hasSupabase || localStudio,
   })
+  const trackLink = usePageAnalytics(null, hasSupabase && Boolean(page.data))
   if (!hasSupabase && !localStudio)
     return (
       <StatusPage title="Halaman belum tersedia">
@@ -44,5 +46,5 @@ export default function PublicPage() {
         </Link>
       </StatusPage>
     )
-  return <Directory page={page.data} />
+  return <Directory page={page.data} onLinkOpen={trackLink} />
 }
