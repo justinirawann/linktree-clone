@@ -41,4 +41,14 @@ describe('tema halaman Linkfy', () => {
     })
     expect(resolveLinkButton(theme, {})).toMatchObject({ ...theme.button, radius: 999 })
   })
+
+  it('mengutamakan radius slider dan mendukung pewarisan bentuk lama', () => {
+    const theme = resolveMemberTheme('light', { radius: 17, shape: 'pill' })
+    expect(theme.button.radius).toBe(17)
+    expect(resolveLinkButton(theme, {}).radius).toBe(17)
+    expect(resolveLinkButton(theme, { radius: 0, shape: 'pill' }).radius).toBe(0)
+    expect(resolveLinkButton(theme, { shape: 'slight' }).radius).toBe(8)
+    expect(resolveLinkButton(theme, { radius: 50 }).radius).toBe(999)
+    expect(resolveLinkButton(theme, { radius: 51 }).radius).toBe(17)
+  })
 })

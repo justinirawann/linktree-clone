@@ -304,9 +304,9 @@ describe('migrasi dan hak akses PostgreSQL', () => {
       icon_key: 'tiktok',
       icon_color: '#34cc88',
     }))
-    const iconStyle = { shape: 'square', icon_style: 'outline', icon_shape: 'circle' }
+    const iconStyle = { radius: 0, icon_style: 'outline', icon_shape: 'circle' }
     const styles = { [links[0].id]: iconStyle, [links[1].id]: { effect: 'glass' } }
-    const appearance = { background: '#ffee00', effect: 'soft', shape: 'pill', icon_style: 'bare' }
+    const appearance = { background: '#ffee00', effect: 'soft', radius: 17, icon_style: 'bare' }
     const save = (theme, overrides, revision = 1) =>
       scalar('select to_jsonb(public.save_member_page($1,$2,$3,$4,$5,$6,$7,$8,$9))', [
         revision,
@@ -328,6 +328,11 @@ describe('migrasi dan hak akses PostgreSQL', () => {
       save(appearance, { [links[0].id]: { icon_shape: 'triangle' } }),
     ).rejects.toMatchObject({ code: '23514' })
     await expect(save({ icon_style: 'invalid' }, styles)).rejects.toMatchObject({ code: '23514' })
+    await expect(save({ radius: 51 }, styles)).rejects.toMatchObject({ code: '23514' })
+    await expect(save({ radius: '17' }, styles)).rejects.toMatchObject({ code: '23514' })
+    await expect(save(appearance, { [links[0].id]: { radius: 2.5 } })).rejects.toMatchObject({
+      code: '23514',
+    })
     const saved = await save(appearance, styles)
     expect(saved.link_styles).toEqual(styles)
     await expect(save({}, {})).rejects.toMatchObject({ code: 'PT409' })

@@ -1,10 +1,10 @@
-import { Field } from '../../../shared/ui/Controls'
+import { Button, Field } from '../../../shared/ui/Controls'
 import { ColorField } from '../../../shared/ui/ColorField'
 import { EditorHeading } from '../../../shared/ui/EditorHeading'
 import { Palette } from 'lucide-react'
 import {
   BUTTON_EFFECTS,
-  BUTTON_SHAPES,
+  MAX_BUTTON_RADIUS,
   ICON_SHAPES,
   ICON_STYLES,
   resolveMemberTheme,
@@ -19,37 +19,65 @@ function patchStyle(current, key, value) {
 
 export function ButtonFields({ settings, button, onChange, perLink = false }) {
   const reset = perLink ? 'Ikuti tema' : 'Otomatis'
+  const radius = Math.min(button.radius, MAX_BUTTON_RADIUS)
+  const radiusLabel = radius === MAX_BUTTON_RADIUS ? 'Kapsul' : `${radius} px`
+  const hasCustomRadius = settings.radius !== undefined || settings.shape !== undefined
   function change(key, value) {
     onChange(patchStyle(settings, key, value))
   }
+  function changeRadius(radius) {
+    const next = { ...settings }
+    delete next.shape
+    if (radius === undefined) delete next.radius
+    else next.radius = radius
+    onChange(next)
+  }
   return (
     <div className="member-link-fields">
-      {[
-        [
-          'shape',
-          'Bentuk tombol',
-          Object.entries(BUTTON_SHAPES).map(([key, shape]) => [key, shape.label]),
-        ],
-        ['effect', 'Gaya tombol', Object.entries(BUTTON_EFFECTS)],
-      ].map(([key, label, options]) => (
-        <Field key={key} label={label}>
-          {(props) => (
-            <select
-              className="dropdown"
-              {...props}
-              value={perLink ? settings[key] || '' : button[key]}
-              onChange={(e) => change(key, e.target.value)}
-            >
-              {perLink && <option value="">Ikuti tema</option>}
-              {options.map(([value, text]) => (
-                <option key={value} value={value}>
-                  {text}
-                </option>
-              ))}
-            </select>
-          )}
-        </Field>
-      ))}
+      <Field label="Bentuk tombol">
+        {(props) => (
+          <>
+            <div className="flex items-center gap-3">
+              <input
+                {...props}
+                className="min-w-0 flex-1"
+                type="range"
+                min={0}
+                max={MAX_BUTTON_RADIUS}
+                step={1}
+                value={radius}
+                aria-valuetext={radiusLabel}
+                onChange={(e) => changeRadius(e.target.valueAsNumber)}
+              />
+              <span className="muted text-sm tabular-nums" aria-hidden="true">
+                {radiusLabel}
+              </span>
+            </div>
+            {hasCustomRadius && (
+              <Button className="self-start" onClick={() => changeRadius(undefined)}>
+                {perLink ? 'Ikuti tema' : 'Reset bentuk tombol'}
+              </Button>
+            )}
+          </>
+        )}
+      </Field>
+      <Field label="Gaya tombol">
+        {(props) => (
+          <select
+            className="dropdown"
+            {...props}
+            value={perLink ? settings.effect || '' : button.effect}
+            onChange={(e) => change('effect', e.target.value)}
+          >
+            {perLink && <option value="">Ikuti tema</option>}
+            {Object.entries(BUTTON_EFFECTS).map(([value, text]) => (
+              <option key={value} value={value}>
+                {text}
+              </option>
+            ))}
+          </select>
+        )}
+      </Field>
       <ColorField
         label="Warna tombol"
         value={button.fill}

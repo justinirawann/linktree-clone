@@ -26,13 +26,9 @@ export const MEMBER_THEMES = {
   },
 }
 
-export const BUTTON_SHAPES = {
-  square: { label: 'Kotak', radius: 0 },
-  slight: { label: 'Sedikit membulat', radius: 8 },
-  rounded: { label: 'Membulat', radius: 14 },
-  round: { label: 'Sangat membulat', radius: 28 },
-  pill: { label: 'Kapsul', radius: 999 },
-}
+export const MAX_BUTTON_RADIUS = 50
+const PILL_RADIUS = 999
+const LEGACY_BUTTON_RADII = { square: 0, slight: 8, rounded: 14, round: 28, pill: PILL_RADIUS }
 export const BUTTON_EFFECTS = {
   plain: 'Biasa',
   glass: 'Glassmorphism',
@@ -57,13 +53,19 @@ const color = z.string().regex(/^#[0-9a-f]{6}$/i)
 const buttonSchema = z.object({
   fill: color.optional(),
   ink: color.optional(),
-  shape: z.enum(Object.keys(BUTTON_SHAPES)).optional(),
+  shape: z.enum(Object.keys(LEGACY_BUTTON_RADII)).optional(),
+  radius: z.number().int().min(0).max(MAX_BUTTON_RADIUS).optional(),
   effect: z.enum(Object.keys(BUTTON_EFFECTS)).optional(),
 })
 const appearanceSchema = buttonSchema.extend({
   background: color.optional(),
   gradient: color.optional(),
 })
+
+function resolveButtonRadius({ radius, shape }, fallback) {
+  if (radius === MAX_BUTTON_RADIUS) return PILL_RADIUS
+  return radius ?? LEGACY_BUTTON_RADII[shape] ?? fallback
+}
 
 function channels(hex) {
   return hex
@@ -144,7 +146,13 @@ export function resolveMemberTheme(preset, appearance) {
       button_color: fill,
       button_text_color: opaqueInk,
     },
-    button: { fill, ink, shape: custom.shape || 'rounded', effect, glass },
+    button: {
+      fill,
+      ink,
+      radius: resolveButtonRadius(custom, LEGACY_BUTTON_RADII.rounded),
+      effect,
+      glass,
+    },
     backdrop,
     manualInk: custom.ink,
   }
@@ -152,7 +160,12 @@ export function resolveMemberTheme(preset, appearance) {
 
 export function resolveLinkButton(design, settings) {
   const overrides = buttonSchema.safeParse(settings).data || {}
-  const button = { ...design.button, ...overrides }
+  const { shape, radius, ...styles } = overrides
+  const button = {
+    ...design.button,
+    ...styles,
+    radius: resolveButtonRadius({ shape, radius }, design.button.radius),
+  }
   if (button.fill !== design.button.fill || button.effect !== design.button.effect) {
     button.glass =
       button.effect === 'glass' ? glassSurface(button.fill, design.backdrop) : undefined
@@ -162,5 +175,5 @@ export function resolveLinkButton(design, settings) {
     design.manualInk ||
     button.glass?.ink ||
     (overrides.fill || overrides.effect ? readableInk(button.fill) : design.button.ink)
-  return { ...button, radius: BUTTON_SHAPES[button.shape].radius }
+  return button
 }
