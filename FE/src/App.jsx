@@ -1,3 +1,4 @@
+import { LoadingPage } from './shared/ui/LoadingPage'
 import { lazy, Suspense, useEffect } from 'react'
 import {
   createBrowserRouter,
@@ -74,14 +75,7 @@ function Layout() {
     if (!location.hash) window.scrollTo(0, 0)
   }, [location.pathname, location.hash])
   return (
-    <Suspense
-      fallback={
-        <div className="skeleton-page" role="status" aria-label="Memuat">
-          <i />
-          <i />
-        </div>
-      }
-    >
+    <Suspense fallback={<LoadingPage />}>
       <Outlet />
     </Suspense>
   )

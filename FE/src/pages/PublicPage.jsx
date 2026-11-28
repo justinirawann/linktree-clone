@@ -1,3 +1,4 @@
+import { LoadingPage } from '../shared/ui/LoadingPage'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { siteRepository } from '../features/site'
@@ -18,14 +19,7 @@ export default function PublicPage() {
         <p>Toko belum menghubungkan halaman ini.</p>
       </StatusPage>
     )
-  if (page.isPending)
-    return (
-      <div className="skeleton-page" role="status" aria-label="Memuat halaman toko">
-        <i />
-        <i />
-        <i />
-      </div>
-    )
+  if (page.isPending) return <LoadingPage label="Memuat halaman toko…" />
   if (page.isError)
     return (
       <StatusPage title="Halaman gagal dimuat" retry={page.refetch}>

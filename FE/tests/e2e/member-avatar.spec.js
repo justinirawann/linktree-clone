@@ -179,6 +179,40 @@ async function openMemberStudio(
   await page.getByRole('button', { name: 'Masuk', exact: true }).click()
 }
 
+test('layar memuat Linkfy mengikuti preferensi gerakan sampai profil siap', async ({
+  page,
+}, testInfo) => {
+  let finish
+  const pending = new Promise((resolve) => {
+    finish = resolve
+  })
+  await page.route(FIXTURE_URL + '/rest/v1/rpc/get_member_page', async (route) => {
+    await pending
+    await route.fulfill({ json: { slug: 'maya', display_name: 'Maya', theme: 'light', links: [] } })
+  })
+  await page.route(FIXTURE_URL + '/rest/v1/rpc/record_page_analytics', (route) =>
+    route.fulfill({ json: null }),
+  )
+  await page.setViewportSize({ width: 390, height: 750 })
+  await page.emulateMedia({ reducedMotion: 'no-preference' })
+  await page.goto(SITE_URL + '/maya')
+  const status = page.getByRole('status').filter({ hasText: 'Memuat halaman' })
+  const chain = page.locator('.loading-sculpture img')
+  try {
+    await expect(status).toBeVisible()
+    await expect(chain).toHaveCSS('animation-name', 'linkfy-chain-float')
+    await chain.evaluate((img) => img.decode())
+    await page.screenshot({ path: testInfo.outputPath('loading-linkfy.png') })
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await expect(chain).toHaveCSS('animation-name', 'none')
+    await expect(chain).toBeVisible()
+  } finally {
+    finish()
+  }
+  await expect(page.getByRole('heading', { name: 'Maya' })).toBeVisible()
+  await expect(status).toHaveCount(0)
+})
+
 test('ikon pratinjau mengambil metadata sesuai URL dan tetap berguna saat situs gagal', async ({
   page,
 }) => {

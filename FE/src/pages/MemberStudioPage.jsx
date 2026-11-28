@@ -1,3 +1,4 @@
+import { LoadingPage } from '../shared/ui/LoadingPage'
 import { useEffect, useRef, useState } from 'react'
 import {
   ArrowUpRight,
@@ -469,8 +470,7 @@ export default function MemberStudioPage() {
   })
   const logout = useMutation({ mutationFn: auth.logout })
   if (!hasSupabase || session === null) return <Navigate to="/admin/login" replace />
-  if (session === undefined || page.isPending)
-    return <StatusPage className="linkfy-ui" brand={<LinkfyLogo />} title="Memuat studio…" />
+  if (session === undefined || page.isPending) return <LoadingPage label="Memuat studio…" />
   if (page.isError)
     return (
       <StatusPage

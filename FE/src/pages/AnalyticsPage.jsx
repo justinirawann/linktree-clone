@@ -1,10 +1,11 @@
+import { LoadingPage } from '../shared/ui/LoadingPage'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft, ChartNoAxesColumnIncreasing, RefreshCw } from 'lucide-react'
 import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import { AnalyticsReport, analytics } from '../features/analytics'
 import { useSession } from '../features/auth'
 import { hasSupabase } from '../shared/lib/env'
-import { Button, StatusPage } from '../shared/ui/Controls'
+import { Button } from '../shared/ui/Controls'
 import { LinkfyLogo } from '../shared/ui/LinkfyLogo'
 import './analytics.css'
 
@@ -24,8 +25,7 @@ export default function AnalyticsPage({ ownerStore = false }) {
   const studio = ownerStore ? '/admin/dashboard' : '/dashboard'
 
   if (!hasSupabase || session === null) return <Navigate to="/admin/login" replace />
-  if (!session)
-    return <StatusPage className="linkfy-ui" brand={<LinkfyLogo />} title="Memeriksa sesi…" />
+  if (!session) return <LoadingPage label="Memeriksa sesi…" />
 
   const migrationNeeded = ['PGRST202', '42883'].includes(report.error?.code)
   const accessDenied = report.error?.code === '42501'

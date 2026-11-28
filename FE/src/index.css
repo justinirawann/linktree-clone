@@ -461,8 +461,7 @@ button:disabled {
   padding: 0.7rem 0.25rem;
 }
 .status-page,
-.auth-page,
-.skeleton-page {
+.auth-page {
   min-height: 100dvh;
   display: grid;
   place-content: center;
@@ -512,23 +511,6 @@ button:disabled {
 .eyebrow {
   color: #f58c87;
   font-size: 0.7rem;
-}
-.skeleton-page {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding-top: 84px;
-  gap: 16px;
-}
-.skeleton-page i {
-  width: min(630px, 95%);
-  height: 70px;
-  background: #2c272a;
-  border-radius: 14px;
-}
-.skeleton-page i:first-child {
-  height: 190px;
 }
 .dialog {
   position: fixed;

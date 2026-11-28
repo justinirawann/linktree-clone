@@ -1,3 +1,4 @@
+import { LoadingPage } from '../shared/ui/LoadingPage'
 import { useState } from 'react'
 import { Link, NavLink, Navigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
@@ -52,7 +53,7 @@ function Studio({ section, local, userId }) {
     queryFn: siteRepository.readEditor,
     refetchOnWindowFocus: false,
   })
-  if (query.isPending) return <StatusPage title="Memuat studio…" />
+  if (query.isPending) return <LoadingPage label="Memuat studio…" />
   if (!query.data) return <StatusPage title="Studio gagal dimuat" retry={query.refetch} />
   const page = query.data,
     base = local ? '/studio/' : '/admin/'
@@ -208,7 +209,7 @@ function Studio({ section, local, userId }) {
 export default function StudioPage({ local = false, section }) {
   const { loading, allowed, session, error, retry } = useOwner()
   if (local && localStudio) return <Studio key={section} section={section} local userId="local" />
-  if (loading) return <StatusPage title="Memeriksa sesi…" />
+  if (loading) return <LoadingPage label="Memeriksa sesi…" />
   if (error) return <StatusPage title="Gagal memeriksa akses" retry={retry} />
   if (!allowed) return <Navigate to="/admin/login" replace />
   return <Studio key={section} section={section} userId={session.user.id} />

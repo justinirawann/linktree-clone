@@ -1,3 +1,4 @@
+import { LoadingPage } from '../shared/ui/LoadingPage'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 import { hasSupabase } from '../shared/lib/env'
@@ -18,8 +19,7 @@ export default function MemberPublicPage() {
   const avatar = useMemberAvatar(page.data?.avatar_path)
   const trackLink = usePageAnalytics(slug, Boolean(page.data))
   const brand = <LinkfyLogo />
-  if (hasSupabase && page.isPending)
-    return <StatusPage className="linkfy-ui" brand={brand} title="Memuat halaman…" />
+  if (hasSupabase && page.isPending) return <LoadingPage />
   if (page.isError)
     return (
       <StatusPage

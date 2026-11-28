@@ -1,0 +1,59 @@
+.linkfy-loading {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 24px;
+  color: var(--ly-stage);
+  background:
+    radial-gradient(ellipse at 34% 42%, #e0d0ff8c, transparent 46%),
+    radial-gradient(ellipse at 83% 77%, #e8fa8138, transparent 42%), var(--ly-paper);
+}
+.linkfy-loading p {
+  font: 700 1rem/1.5 var(--font-sans);
+  letter-spacing: -0.02em;
+}
+.loading-sculpture {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(230px, 74vw);
+  aspect-ratio: 1.3;
+  perspective: 560px;
+}
+.loading-sculpture img {
+  position: relative;
+  width: 76%;
+  height: auto;
+  transform: rotateY(-12deg) rotateZ(-4deg);
+}
+.loading-orbit {
+  position: absolute;
+  inset: 9% 2%;
+  border: 2px solid #60459e48;
+  border-radius: 50%;
+  transform: rotateZ(-18deg) rotateX(57deg);
+}
+.loading-orbit::after {
+  content: '';
+  position: absolute;
+  top: 47%;
+  right: -5px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--ly-lime);
+  box-shadow: inset -2px -2px 3px #81952c80;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .loading-sculpture img {
+    animation: linkfy-chain-float 2.6s ease-in-out infinite alternate;
+  }
+  @keyframes linkfy-chain-float {
+    to {
+      transform: translateY(-8px) rotateY(24deg) rotateX(9deg) rotateZ(4deg);
+    }
+  }
+}
