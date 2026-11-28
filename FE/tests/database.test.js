@@ -304,9 +304,9 @@ describe('migrasi dan hak akses PostgreSQL', () => {
       icon_key: 'tiktok',
       icon_color: '#34cc88',
     }))
-    const iconStyle = { radius: 0, icon_style: 'outline', icon_shape: 'circle' }
+    const iconStyle = { radius: 0, effect: 'clay', icon_style: 'outline', icon_shape: 'circle' }
     const styles = { [links[0].id]: iconStyle, [links[1].id]: { effect: 'glass' } }
-    const appearance = { background: '#ffee00', effect: 'soft', radius: 17, icon_style: 'bare' }
+    const appearance = { background: '#ffee00', effect: 'clay', radius: 17, icon_style: 'bare' }
     const save = (theme, overrides, revision = 1) =>
       scalar('select to_jsonb(public.save_member_page($1,$2,$3,$4,$5,$6,$7,$8,$9))', [
         revision,

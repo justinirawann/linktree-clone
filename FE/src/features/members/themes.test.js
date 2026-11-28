@@ -2,6 +2,21 @@ import { describe, expect, it } from 'vitest'
 import { MEMBER_THEMES, resolveLinkButton, resolveMemberTheme } from './themes'
 
 describe('tema halaman Linkfy', () => {
+  it.each(Object.keys(MEMBER_THEMES))(
+    'mewariskan warna clay dan menghormati warna pilihan pada tema %s',
+    (preset) => {
+      const plain = resolveMemberTheme(preset)
+      const clay = resolveMemberTheme(preset, { effect: 'clay', radius: 0 })
+      expect(resolveLinkButton(plain, { effect: 'clay' }).fill).toBe(clay.button.fill)
+      expect(resolveLinkButton(clay, {}).radius).toBe(0)
+      expect(resolveLinkButton(clay, { effect: 'plain' }).fill).toBe(plain.button.fill)
+      const manual = resolveMemberTheme(preset, { fill: '#a7dfc6', ink: '#112233' })
+      expect(resolveLinkButton(manual, { effect: 'clay' })).toMatchObject({
+        fill: '#a7dfc6',
+        ink: '#112233',
+      })
+    },
+  )
   it('memperkuat tint kaca jika dua ujung gradasi membutuhkan kontras lebih tinggi', () => {
     const design = resolveMemberTheme('gradient', {
       background: '#000000',

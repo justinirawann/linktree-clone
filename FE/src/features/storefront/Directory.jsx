@@ -59,11 +59,29 @@ function Cover({ name }) {
     </div>
   )
 }
+function moveGlassReflection(event) {
+  if (
+    event.pointerType !== 'mouse' ||
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+    return
+  const card = event.currentTarget
+  const bounds = card.getBoundingClientRect()
+  card.style.setProperty(
+    '--reflection-x',
+    ((event.clientX - bounds.left) / bounds.width) * 100 + '%',
+  )
+}
+
 function ChannelCard({ link, interactive, onPreview, onLinkOpen }) {
   const button = link.button
   const cardProps = {
     className: 'channel-card ' + (link.layout === 'featured' ? 'featured' : ''),
     'data-effect': button?.effect,
+    onPointerMove: button?.glass ? moveGlassReflection : undefined,
+    onPointerLeave: button?.glass
+      ? (event) => event.currentTarget.style.removeProperty('--reflection-x')
+      : undefined,
     style: button && {
       '--card': button.fill,
       '--card-ink': button.ink,

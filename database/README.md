@@ -28,6 +28,7 @@ Folder `migrations/` adalah sumber schema Supabase. Terapkan setiap file **sekal
 | 022 | Izinkan ikon TikTok pada tautan owner dan halaman Linkfy |
 | 023 | Catat statistik harian dan batasi laporan ke pemilik halaman |
 | 027 | Simpan radius slider bentuk tombol Linkfy untuk tema dan per tautan |
+| 028 | Izinkan gaya tombol Claymorphism untuk halaman dan tautan individual |
 
 ## Pendaftaran pengguna Linkfy
 

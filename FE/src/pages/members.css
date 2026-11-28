@@ -27,41 +27,67 @@
 .member-directory::before {
   background-image: none;
 }
+/* A continuous band of light is visible both through and between the glass links. */
+.member-directory .channel-list:has([data-effect='glass']) {
+  position: relative;
+  isolation: isolate;
+  --glass-violet: color-mix(in srgb, var(--card) 35%, #9880dc);
+  --glass-aqua: color-mix(in srgb, var(--card) 35%, #65b8b0);
+}
+.member-directory .channel-list:has([data-effect='glass'])::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  inset: -55px -4% -62px;
+  background:
+    radial-gradient(
+      ellipse at -32% -55%,
+      transparent 57%,
+      var(--glass-violet) 67%,
+      transparent 78%
+    ),
+    radial-gradient(ellipse at 125% 115%, transparent 36%, var(--glass-aqua) 54%, transparent 72%);
+  opacity: 0.5;
+  mask-image: radial-gradient(ellipse closest-side, #000 55%, transparent 100%);
+}
 .member-directory .channel-card[data-effect='glass'] {
+  --glass-edge: color-mix(in srgb, var(--glass-violet), #171320 40%);
   position: relative;
   border: 1px solid transparent;
   background-color: var(--glass-opaque);
   background-image:
-    radial-gradient(ellipse at 11% 0%, #ffffff42, transparent 47%),
-    radial-gradient(ellipse at 101% 95%, #c5f4ff66, transparent 24%),
-    radial-gradient(ellipse at 5% 114%, #aa98bd2b, transparent 32%),
-    linear-gradient(112deg, #ffffff12, transparent 24% 76%, #ffffff12);
+    radial-gradient(ellipse 58% 32% at 64% 109%, #ffffff80, transparent),
+    linear-gradient(171deg, #ffffff24, transparent 43% 78%, #ffffff10);
   box-shadow:
-    inset 0 2px 2px -1px #ffffffab,
-    inset 2px 0 5px -3px #ffffffa6,
-    inset -3px -3px 6px -4px #b9edffeb,
-    inset 0 -3px 5px -2px #554b753b,
-    0 1px 2px #20183224,
-    0 6px 16px -6px #22183236;
+    inset 0 1px 1px #ffffffbd,
+    inset 0 -1px 2px #ffffff80,
+    inset 2px 0 5px -3px #fff,
+    inset -2px -3px 6px -4px var(--glass-edge),
+    0 1px 2px #1a13232b,
+    0 8px 16px -9px #1a13235c;
 }
-/* A narrow rim carries the strongest reflections and leaves the label clear. */
 .member-directory .channel-card[data-effect='glass']::before {
   content: '';
   position: absolute;
   inset: -1px;
-  padding: 1.5px;
+  padding: 2px;
   border-radius: inherit;
   pointer-events: none;
-  background: linear-gradient(
-    132deg,
-    #fff 0%,
-    #ffffffa6 17%,
-    #9bafc44a 37%,
-    #8175954d 57%,
-    #e4f8ffe0 80%,
-    #ffffff80 92%,
-    #99b2c354
-  );
+  background:
+    radial-gradient(ellipse 26% 95% at var(--reflection-x, 22%) 0%, white, transparent),
+    conic-gradient(
+      from 20deg,
+      #ffffff0a,
+      #ffffff91 17%,
+      #ffffff12 24%,
+      var(--glass-aqua) 35%,
+      white 42%,
+      #ffffff1a 55%,
+      var(--glass-edge) 70%,
+      #ffffffd9 81%,
+      #ffffff0a 96%
+    );
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
@@ -71,41 +97,41 @@
     linear-gradient(#000 0 0);
   mask-composite: exclude;
 }
-@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) and
+  (color: color-mix(in srgb, white, transparent)) {
   .member-directory .channel-card[data-effect='glass'] {
     background-color: color-mix(in srgb, var(--card) var(--glass-tint), transparent);
-    -webkit-backdrop-filter: blur(18px) saturate(112%);
-    backdrop-filter: blur(18px) saturate(112%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    backdrop-filter: blur(10px) saturate(120%);
   }
+}
+.member-directory .channel-card[data-effect='glass'] .channel-icon[data-icon-style='filled'] {
+  background-image: linear-gradient(145deg, #ffffff26, transparent 65%);
+  box-shadow:
+    inset 0 1px 1px #ffffff5c,
+    0 2px 4px #14112121;
 }
 .member-directory .channel-card[data-effect='glass'] .channel-copy small {
   color: inherit;
 }
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .member-directory a.channel-card[data-effect='glass']:hover::before {
-    background-position: 100% center;
-  }
-  .member-directory a.channel-card[data-effect='glass']::before {
-    background-size: 125% 100%;
-    transition: background-position 260ms ease-out;
-  }
+.member-directory .channel-card[data-effect='glass']:where(:hover, :active) {
+  border-color: transparent;
+  transform: none;
 }
 @media (prefers-reduced-motion: no-preference) {
   .member-directory a.channel-card[data-effect='glass']:active {
-    transform: scale(0.99);
+    transform: scale(0.985);
   }
 }
-@media (prefers-reduced-transparency: reduce) {
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active) {
   .member-directory .channel-card[data-effect='glass'] {
     background: var(--glass-opaque);
+    border-color: currentColor;
+    box-shadow: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
-}
-@media (forced-colors: active) {
-  .member-directory .channel-card[data-effect='glass'] {
-    border-color: LinkText;
-  }
+  .member-directory .channel-list:has([data-effect='glass'])::before,
   .member-directory .channel-card[data-effect='glass']::before {
     display: none;
   }
@@ -126,6 +152,41 @@
   box-shadow:
     inset 4px 5px 9px -1px var(--recess-shade),
     inset -2px -2px 5px -1px var(--recess-light);
+}
+.member-directory .channel-card[data-effect='clay'] {
+  --clay-light: color-mix(in srgb, var(--card), white 58%);
+  --clay-shade: color-mix(in srgb, var(--card), #2e183e 34%);
+  --clay-shadow: color-mix(in srgb, var(--clay-shade) 48%, transparent);
+  --clay-lift: 4px 8px 10px -5px var(--clay-shadow);
+  background: var(--card);
+  border: 0;
+  box-shadow:
+    inset 3px 5px 8px -2px var(--clay-light),
+    inset -4px -7px 10px -2px var(--clay-shade),
+    var(--clay-lift);
+}
+.member-directory .channel-card[data-effect='clay'] .channel-icon[data-icon-style='filled'] {
+  box-shadow:
+    inset 1px 2px 4px #ffffff54,
+    inset -1px -3px 4px #160f244f,
+    1px 3px 4px #1f13292e;
+}
+.member-directory a.channel-card[data-effect='clay']:hover {
+  transform: none;
+}
+.member-directory a.channel-card[data-effect='clay']:active {
+  --clay-lift: 1px 2px 3px -1px var(--clay-shadow);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .member-directory a.channel-card[data-effect='clay']:active {
+    transform: translateY(2px) scale(0.992);
+  }
+}
+@media (forced-colors: active), (prefers-contrast: more) {
+  .member-directory .channel-card[data-effect='clay'] {
+    border: 1px solid currentColor;
+    box-shadow: none;
+  }
 }
 .member-directory .channel-card:focus-visible {
   outline: 3px solid var(--ink);
@@ -253,7 +314,7 @@
 .member-directory .share-button:hover:enabled {
   background: color-mix(in srgb, var(--card) 87%, var(--ly-accent));
 }
-.member-directory .channel-card.featured:not([data-effect='glass']) {
+.member-directory .channel-card.featured:not([data-effect='glass'], [data-effect='clay']) {
   background: color-mix(in srgb, var(--card) 91%, var(--ly-accent));
   border-color: color-mix(in srgb, var(--card) 75%, var(--ly-accent));
 }

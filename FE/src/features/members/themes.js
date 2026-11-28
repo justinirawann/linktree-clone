@@ -33,6 +33,7 @@ export const BUTTON_EFFECTS = {
   plain: 'Biasa',
   glass: 'Glassmorphism',
   soft: 'Neumorphism',
+  clay: 'Claymorphism',
 }
 export const ICON_STYLES = { filled: 'Wadah isi', outline: 'Outline', bare: 'Icon Only' }
 export const ICON_SHAPES = {
@@ -103,7 +104,7 @@ function readableInk(fill) {
 
 function glassSurface(fill, backdrop) {
   // Keep the glass clear unless a gradient needs more tint for readable text.
-  for (const tint of [0.36, 0.56, 0.76, 0.84]) {
+  for (const tint of [0.24, 0.4, 0.56, 0.76, 0.84]) {
     const colors = backdrop.map((color) => mix(color, fill, tint))
     const levels = colors.map(luminance)
     const blackContrast = (Math.min(...levels) + 0.05) / 0.05
@@ -129,13 +130,19 @@ export function resolveMemberTheme(preset, appearance) {
   )
   const sample = base.background_type === 'gradient' ? mix(background, gradient, 0.5) : background
   const suggested = hasCustomBackground ? mix(sample, readableInk(sample), 0.2) : base.button_color
-  const fill = custom.fill || suggested
+  const standardFill = custom.fill || suggested
+  const clayPigment = base.background_type === 'gradient' ? gradient : '#ae87d9'
+  const clayFill = custom.fill || mix(sample, clayPigment, 0.52)
   const effect = custom.effect || 'plain'
+  const fill = effect === 'clay' ? clayFill : standardFill
   const backdrop =
     base.background_type === 'gradient' ? [background, sample, gradient] : [background]
   const glass = effect === 'glass' ? glassSurface(fill, backdrop) : undefined
   const opaqueInk =
-    custom.ink || (custom.fill || hasCustomBackground ? readableInk(fill) : base.button_text_color)
+    custom.ink ||
+    (custom.fill || hasCustomBackground || effect === 'clay'
+      ? readableInk(fill)
+      : base.button_text_color)
   const ink = custom.ink || glass?.ink || opaqueInk
   return {
     theme: {
@@ -154,6 +161,8 @@ export function resolveMemberTheme(preset, appearance) {
       glass,
     },
     backdrop,
+    standardFill,
+    clayFill,
     manualInk: custom.ink,
   }
 }
@@ -166,6 +175,7 @@ export function resolveLinkButton(design, settings) {
     ...styles,
     radius: resolveButtonRadius({ shape, radius }, design.button.radius),
   }
+  button.fill = overrides.fill || (button.effect === 'clay' ? design.clayFill : design.standardFill)
   if (button.fill !== design.button.fill || button.effect !== design.button.effect) {
     button.glass =
       button.effect === 'glass' ? glassSurface(button.fill, design.backdrop) : undefined

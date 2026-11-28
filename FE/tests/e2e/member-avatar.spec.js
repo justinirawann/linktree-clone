@@ -465,11 +465,74 @@ test('kaca mengikuti tema publik di layar ponsel dan pilihan kurangi transparans
     await page.screenshot({ path: testInfo.outputPath('glass-' + preset + '.png') })
     await page.unroute(FIXTURE_URL + '/rest/v1/rpc/get_member_page')
   }
+  const link = page.getByRole('link', { name: 'Instagram' })
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await page.emulateMedia({ reducedMotion: 'no-preference' })
+  await link.hover({ position: { x: 42, y: 20 } })
+  const reflection = () => link.evaluate((el) => el.style.getPropertyValue('--reflection-x'))
+  const firstReflection = await reflection()
+  expect(firstReflection).toMatch(/%$/)
+  await link.hover({ position: { x: 300, y: 20 } })
+  expect(parseFloat(await reflection())).toBeGreaterThan(parseFloat(firstReflection))
+  await page.mouse.move(0, 0)
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await link.hover()
+  expect(await reflection()).toBe('')
   const media = await page.context().newCDPSession(page)
   await media.send('Emulation.setEmulatedMedia', {
     features: [{ name: 'prefers-reduced-transparency', value: 'reduce' }],
   })
-  await expect(page.getByRole('link', { name: 'Instagram' })).toHaveCSS('backdrop-filter', 'none')
+  await expect(link).toHaveCSS('backdrop-filter', 'none')
+})
+
+test('Claymorphism tersimpan di Studio dan tampil pada tiga tema publik', async ({
+  page,
+}, testInfo) => {
+  await openMemberStudio(page)
+  const global = page.getByRole('region', { name: 'Tampilan halaman' })
+  await global.getByLabel('Gaya tombol').selectOption({ label: 'Claymorphism' })
+  await global.getByRole('slider', { name: 'Bentuk tombol' }).press('End')
+  for (const [index, title, icon, fill] of [
+    [2, 'Katalog', 'catalog', '#ffbda1'],
+    [3, 'WhatsApp', 'whatsapp', '#a1d9c2'],
+  ]) {
+    await page.getByRole('button', { name: 'Tambah tautan' }).click()
+    await page.getByLabel('Judul tautan ' + index).fill(title)
+    await page.getByLabel('URL tujuan ' + index).fill('https://ruangstudio.id/' + icon)
+    await page
+      .getByLabel('Ikon', { exact: true })
+      .nth(index - 1)
+      .selectOption(icon)
+    const custom = page.locator('details').filter({ hasText: 'Tampilan khusus tautan ' + index })
+    await custom.locator('summary').click()
+    await custom.getByLabel('Warna tombol', { exact: true }).fill(fill)
+  }
+  for (const preset of ['light', 'dark', 'gradient']) {
+    await global.getByLabel('Tema', { exact: true }).selectOption(preset)
+    const preview = page.getByRole('region', { name: 'Pratinjau toko' })
+    const first = preview.locator('.channel-card').first()
+    await expect(first).toHaveAttribute('data-effect', 'clay')
+    const material = await first.evaluate((el) => getComputedStyle(el).boxShadow)
+    await page.getByRole('button', { name: 'Simpan halaman' }).click()
+    await expect(page.getByText('Perubahan tersimpan.', { exact: true })).toBeVisible()
+    await page.getByRole('link', { name: 'Lihat halaman publik' }).click()
+    await page.setViewportSize({ width: 390, height: 750 })
+    const card = page.getByRole('link', { name: 'Portofolio' })
+    await expect(card).toHaveCSS('box-shadow', material)
+    await expect(card).toHaveCSS('border-radius', '999px')
+    await expect(page.getByRole('link', { name: 'Katalog' })).toHaveCSS(
+      'background-color',
+      'rgb(255, 189, 161)',
+    )
+    const list = await page.locator('.channel-list').boundingBox()
+    await page.screenshot({
+      path: testInfo.outputPath('clay-' + preset + '.png'),
+      clip: { x: 0, y: Math.floor(list.y) - 14, width: 390, height: Math.ceil(list.height) + 32 },
+    })
+    await page.setViewportSize({ width: 1280, height: 800 })
+    await page.goto(SITE_URL + '/dashboard')
+    await expect(global.getByLabel('Gaya tombol')).toHaveValue('clay')
+  }
 })
 
 test('studio tetap bisa menyimpan profil sebelum migrasi tema dijalankan', async ({ page }) => {
